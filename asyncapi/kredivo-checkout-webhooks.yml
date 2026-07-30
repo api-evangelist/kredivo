@@ -1,0 +1,141 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+type: Webhooks
+api: Kredivo Checkout API
+summary: |
+  Kredivo publishes no AsyncAPI document, but it does document a real asynchronous event surface:
+  the authoritative outcome of every checkout is delivered by HTTP POST to a merchant-supplied
+  `push_uri`, and the merchant confirms it by calling back to Kredivo. This file captures that
+  webhook catalog. It is not an AsyncAPI spec and is not presented as one — Kredivo ships no event
+  spec, no event catalog, no streaming surface and no subscription management API.
+delivery:
+  style: HTTP POST to a merchant-supplied URI
+  registration:
+    per_transaction: true
+    field: push_uri
+    operations:
+    - createCheckoutUrl
+    - initOfflineCheckout
+    description: |
+      Unusually, the callback destination is supplied per transaction as a request field rather than
+      configured once in a dashboard. Every checkout names its own `push_uri`.
+    out_of_band:
+      description: |
+        The token-deactivation notification is the exception — its endpoint cannot be set per
+        transaction and must be registered with Kredivo directly.
+      how: Contact Kredivo to register the push notification endpoint URL.
+  content_type: application/json
+  retries:
+    documented: false
+    note: |
+      Kredivo publishes no retry schedule, no delivery-attempt limit and no dead-letter behaviour.
+      Merchants must assume a notification can be lost and rely on the polling fallback.
+  ordering:
+    guaranteed: false
+    documented: false
+security:
+  signature_header: none
+  hmac: false
+  mechanism: callback verification
+  description: |
+    There is no signature header on the notification. Verification is a round trip: the notification
+    carries a `signature_key`, and the merchant calls GET /kredivo/v2/update with that key and the
+    `transaction_id` to confirm the notification genuinely originated from Kredivo and to read the
+    authoritative state.
+  verification_operation:
+    operationId: confirmTransaction
+    path: /kredivo/v2/update
+    parameters:
+    - transaction_id
+    - signature_key
+  failure_response:
+    message: Field secret_key is INCORRECT.
+    meaning: The signature key did not validate — the notification is unverified and must not be acted on.
+  guidance: |
+    Never fulfil an order on the notification payload alone. Treat the push as a hint that state has
+    changed, and treat the response of confirmTransaction as the only source of truth.
+events:
+- name: transaction.status_update
+  description: |
+    Sent when a shopper completes (or fails to complete) a Kredivo checkout, carrying the resulting
+    transaction state. Applies to 2-click, 0-click, QR and EDC checkout alike.
+  trigger: Shopper completes the transaction flow, or the transaction is denied or expires.
+  delivered_to: push_uri
+  method: POST
+  merchant_response:
+    description: |
+      The merchant responds to the notification with a JSON acknowledgement indicating it has
+      received and created the order in its own system.
+    shape:
+      status: OK or ERROR
+      message: Message from merchant if any
+  verify_with: confirmTransaction
+  authoritative_payload:
+    description: Fields returned by confirmTransaction after verification.
+    fields:
+    - status
+    - message
+    - legal_name
+    - fraud_status
+    - order_id
+    - transaction_id
+    - transaction_status
+    - transaction_time
+    - amount
+    - payment_type
+    - user_token
+    - sub_merchant_id
+  state_values:
+    transaction_status:
+    - settlement
+    - pending
+    - deny
+    - cancel
+    - expire
+    fraud_status:
+    - accept
+    - deny
+  notes: |
+    `user_token` is present on the 0-click variant of the payload — this is how a merchant receives
+    the token for a newly tokenized shopper. `sub_merchant_id` is present on the QR and EDC variants.
+- name: user_token.deactivated
+  description: |
+    Sent when a shopper deactivates their tokenized Kredivo account from inside the Kredivo app, so
+    the merchant can invalidate the stored `user_token` on its side.
+  trigger: Shopper deactivates the tokenized account in the Kredivo app.
+  delivered_to: A push notification endpoint registered with Kredivo out of band.
+  method: POST
+  payload:
+    message: Message if any
+    client_user_key: The merchant-side shopper identifier supplied at tokenization.
+  merchant_response:
+    status: OK
+    message: Message from merchant if any
+  guidance: |
+    On receipt, delete the stored user_token for that client_user_key. A subsequent 0-click attempt
+    with a dead token is not fatal — createCheckoutUrl returns a redirect_url for the 2-click
+    fallback — but acting on this event avoids a degraded checkout.
+polling_fallback:
+  operationId: checkTransactionStatus
+  path: /kredivo/transaction/status
+  key: order_id
+  description: |
+    Documented explicitly as the fallback for when a push notification fails to arrive. Given that no
+    retry policy is published, a reconciliation sweep over unresolved orders using this endpoint is
+    a practical necessity rather than an optimisation.
+reference_implementation:
+  name: Example push_uri handler
+  url: https://doc.kredivo.com/push_uri/example_push_uri.zip
+  probed_status: 200
+asyncapi_spec:
+  published: false
+  note: |
+    No AsyncAPI document is published, and no /asyncapi.yaml was found on the docs host (probed 404
+    on 2026-07-19). No AsyncAPI spec has been fabricated for this repo.
+gaps:
+- No AsyncAPI or machine-readable event catalog.
+- No signature header — verification requires a synchronous round trip per notification.
+- No published retry policy, delivery guarantees or ordering guarantees.
+- No event versioning, and no subscription-management API.
+- Callback endpoint is set per transaction, so there is no central place to rotate it.

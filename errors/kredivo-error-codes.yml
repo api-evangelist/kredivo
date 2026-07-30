@@ -1,0 +1,134 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+api: Kredivo Checkout API
+format: proprietary
+rfc9457: false
+summary: |
+  Kredivo does not publish a consolidated error-code reference. The API returns application errors
+  inside an HTTP 200 response, signalled by `status: "ERROR"` and described by a nested `error`
+  object. This catalog captures the envelope, the state vocabularies that carry most of the
+  meaningful failure signal, and every concrete error code and message Kredivo actually documents by
+  example. It is deliberately short — padding it with invented codes would be worse than an honest
+  gap.
+envelope:
+  http_status: 200
+  discriminator:
+    field: status
+    ok: OK
+    error: ERROR
+  error_object:
+    field: error
+    properties:
+      kind:
+        type: string
+        description: Type of error. Every documented example carries the literal value "deprecated".
+      code:
+        type: [integer, 'null']
+        description: Numeric error code. Null in most documented examples.
+      message:
+        type: string
+        description: Human-readable message. Sometimes returned in Indonesian.
+  example:
+    status: ERROR
+    error:
+      code: 2415
+      message: Cancellation amount bigger than remaining transaction amount that can be cancelled
+      kind: deprecated
+  caveats:
+  - |
+    HTTP status code is not a failure signal. A failed call is HTTP 200. Clients that branch on
+    response.ok will treat every documented error as a success.
+  - |
+    `error.code` is frequently null, so clients cannot key remediation logic on the code alone and
+    must fall back to string matching on `error.message` — brittle, and worth raising with Kredivo.
+  - |
+    The literal `"kind": "deprecated"` appears in every published error example across all
+    endpoints. Its meaning is not explained in the documentation.
+  - |
+    Messages are not localised consistently — English and Indonesian messages appear in the same
+    envelope shape (e.g. "Transaksi sudah dibatalkan.").
+errors:
+- code: 2415
+  message: Cancellation amount bigger than remaining transaction amount that can be cancelled
+  operation: cancelTransaction
+  path: /kredivo/v2/cancel_transaction
+  cause: |
+    The requested `cancellation_amount` exceeds the amount of the transaction still eligible for
+    cancellation, or is zero or negative.
+  remediation: |
+    Read the current transaction amount via checkTransactionStatus, subtract cancellations already
+    processed, and cancel no more than the remainder. Omit `cancellation_amount` entirely for a full
+    cancellation.
+  source: https://doc.kredivo.com/
+- code: 1009
+  message: Transaksi sudah dibatalkan.
+  message_en: Transaction has already been cancelled.
+  operation: cancelTransaction
+  path: /kredivo/v2/cancel_transaction
+  cause: The transaction is already in the cancel state.
+  remediation: Treat as terminal success — the desired end state already holds. Do not retry.
+  source: https://doc.kredivo.com/
+- code: null
+  message: Invalid merchant
+  operation: createCheckoutUrl, deactivateUserToken
+  cause: The `server_key` is not recognised, or is being used against the wrong environment.
+  remediation: |
+    Confirm the key matches the environment — the sandbox key is published in the docs, the
+    production key is issued privately by Kredivo. Request production credentials from
+    merchops@kredivo.com.
+  source: https://doc.kredivo.com/
+- code: null
+  message: Invalid user_token
+  operation: deactivateUserToken, getUserCreditDetails
+  cause: |
+    The supplied `user_token` is unknown or has been deactivated — including deactivation by the
+    shopper from inside the Kredivo app.
+  remediation: |
+    Discard the stored token and fall back to a 2-click checkout to re-tokenize the shopper. On
+    createCheckoutUrl an invalid token is not fatal: the response still carries a `redirect_url` for
+    the 2-click fallback path.
+  source: https://doc.kredivo.com/
+- code: null
+  message: Field secret_key is INCORRECT.
+  operation: confirmTransaction
+  cause: The `signature_key` supplied when confirming a push notification did not validate.
+  remediation: |
+    Use the `signature_key` exactly as delivered in the push notification payload. A failure here
+    means the notification is unverified — do not fulfil the order on it.
+  source: https://doc.kredivo.com/
+- code: null
+  message: This order is already PROCESSED.
+  operation: createCheckoutUrl
+  cause: A checkout has already been processed for this `order_id`.
+  remediation: |
+    Generate a fresh `order_id` per checkout attempt, or read the existing outcome via
+    checkTransactionStatus rather than re-initiating.
+  source: https://doc.kredivo.com/
+- code: null
+  message: This cancellation_id is already PROCESSED.
+  operation: cancelTransaction
+  cause: A cancellation with this `cancellation_id` has already been applied.
+  remediation: |
+    Treat as terminal success — this is the idempotency guard firing, not a fault. Note that Kredivo
+    does not replay the original success body.
+  source: https://doc.kredivo.com/
+state_vocabularies:
+  note: |
+    Most of Kredivo's failure signal is carried by state enums rather than error codes. These are
+    catalogued in full in errors/kredivo-decline-codes.yml.
+  transaction_status:
+  - settlement
+  - pending
+  - deny
+  - cancel
+  - expire
+  fraud_status:
+  - accept
+  - deny
+gaps:
+- No consolidated error-code reference is published; codes are only visible in scattered examples.
+- No numeric code ranges or classes are documented, so 2415 and 1009 cannot be generalised.
+- No machine-readable error registry.
+- Application errors are not distinguishable by HTTP status code.
+- No RFC 9457 problem+json support.

@@ -1,0 +1,84 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+api: Kredivo Checkout API
+summary: |
+  Kredivo publishes an open sandbox with a shared server key and a shared test account, documented
+  under "Environment Setup". Every value below is transcribed verbatim from Kredivo's own public
+  documentation — none is invented, and none is a real credential. The production endpoint is
+  deliberately not published; merchants must request it.
+environments:
+- name: sandbox
+  base_url: https://sandbox.kredivo.com/
+  published: true
+  surfaces: QR and 2-click checkout
+  credentials:
+    server_key: 8tLHIx8V0N6KtnSpS9Nbd6zROFFJH7
+    note: |
+      A single shared sandbox server key published openly in the docs. It is not merchant-specific
+      and carries no secrecy expectation. A variant with a trailing "x"
+      (8tLHIx8V0N6KtnSpS9Nbd6zROFFJH7x) appears in the QR checkout example in the same docs — the
+      discrepancy is Kredivo's, and is worth confirming with merchant operations before assuming
+      either works for the offline surface.
+  test_account:
+    username: '81513114262'
+    password: '663482'
+    transaction_otp: '4567'
+    note: |
+      Published shared test shopper. The OTP is fixed at 4567 for all sandbox transactions — no OTP
+      is actually delivered.
+- name: production
+  base_url: null
+  published: false
+  how_to_obtain: |
+    Kredivo does not publish the production endpoint. Merchants must request the live server
+    endpoint from merchops@kredivo.com before going live.
+  credentials:
+    server_key: per-merchant, issued privately by Kredivo
+  note: |
+    Only transactions sent to the production server are processed as real transactions.
+key_modes:
+  distinguishable_by_prefix: false
+  notes: |
+    Kredivo server keys carry no environment prefix (no test_/live_ convention). A sandbox key and a
+    production key are indistinguishable by inspection, so the environment is determined purely by
+    which host the request is sent to. Integrators should bind key and base URL together in
+    configuration to avoid sending a sandbox key to production or the reverse.
+test_data:
+  test_cards: not applicable
+  test_bank_accounts: not applicable
+  notes: |
+    Kredivo is a credit account, not a card scheme — there are no test card numbers. The sandbox
+    test surface is the single published test shopper account plus the fixed OTP.
+  magic_values:
+  - value: '4567'
+    field: transaction OTP
+    behavior: Always accepted as the OTP in sandbox.
+time_simulation:
+  test_clocks: false
+  notes: |
+    No test clock or time-simulation tooling is published. Behaviour that depends on elapsed time —
+    notably checkout `expiration_time` (24 hour default) and the one-hour cancellation de-duplication
+    window — cannot be fast-forwarded, so those paths are slow to exercise in sandbox.
+fixtures_and_triggers:
+  published: false
+  notes: |
+    Kredivo publishes no documented way to force a specific outcome in sandbox. There are no
+    documented trigger values for producing a `deny` transaction_status, a `deny` fraud_status, an
+    `expire`, or a credit-limit exhaustion. This is the most significant sandbox gap: the failure
+    paths a merchant most needs to test are the ones with no published way to reproduce.
+reference_implementation:
+  name: Example push_uri handler
+  url: https://doc.kredivo.com/push_uri/example_push_uri.zip
+  description: |
+    Kredivo's published sample merchant push-notification endpoint — the practical starting point for
+    testing the asynchronous callback leg against sandbox.
+  probed_status: 200
+support:
+  email: merchops@finaccel.co
+  note: Documented contact for help with the documentation and the sandbox environment.
+gaps:
+- No way to force deny, expire or fraud-decline outcomes in sandbox.
+- No test clock for expiry or the one-hour cancellation window.
+- Sandbox server key is inconsistent between the 2-click and QR examples.
+- Shared (not per-merchant) sandbox credentials mean test state may be affected by other integrators.

@@ -1,0 +1,94 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+notes: |
+  Kredivo does not publish first-party client libraries to npm, PyPI, Packagist, Maven Central,
+  NuGet, pkg.go.dev, RubyGems or crates.io — all were probed on 2026-07-19 and returned no
+  first-party package (the `kredivo` name on npm is an unrelated Next.js scaffold by a third party;
+  PyPI and Packagist have no `kredivo` package). Kredivo also has no public GitHub organization.
+  What Kredivo does ship first-party are downloadable ecommerce platform plugins, hosted on the
+  documentation site. Those are captured below as the official integration surface; every download
+  URL was verified 200 on 2026-07-19.
+packages:
+- language: php
+  platform: WooCommerce
+  registry: vendor-download
+  name: Kredivo for WooCommerce
+  version: v3.x
+  url: https://doc.kredivo.com/Plugins/Woocommerce/kredivo-woo-v3.zip
+  install: Download the zip and install via WooCommerce plugin upload.
+  official: true
+  probed_status: 200
+- language: php
+  platform: PrestaShop
+  registry: vendor-download
+  name: Kredivo for PrestaShop
+  version: v1.6.x
+  url: https://doc.kredivo.com/Plugins/Prestashop/kredivo-prestashop.zip
+  install: Download the zip and install via the PrestaShop module manager.
+  official: true
+  probed_status: 200
+- language: php
+  platform: OpenCart
+  registry: vendor-download
+  name: Kredivo for OpenCart
+  version: v1.x
+  url: https://doc.kredivo.com/Plugins/Opencart/v.1.x.x/OpenCart.v1.x.zip
+  install: Download the zip and install via the OpenCart extension installer.
+  official: true
+  probed_status: 200
+- language: php
+  platform: OpenCart
+  registry: vendor-download
+  name: Kredivo for OpenCart
+  version: v2.x
+  url: https://doc.kredivo.com/Plugins/Opencart/v.2.x.x/OpenCart.v2.x.zip
+  install: Download the zip and install via the OpenCart extension installer.
+  official: true
+  probed_status: 200
+- language: php
+  platform: Magento
+  registry: vendor-download
+  name: Kredivo for Magento
+  version: v1.x
+  url: https://doc.kredivo.com/Plugins/Magento/v.1.x.x/magento.v1.x.zip
+  install: Download the zip and install into app/code.
+  official: true
+  probed_status: 200
+- language: php
+  platform: Magento
+  registry: vendor-download
+  name: Kredivo for Magento
+  version: v2.x
+  url: https://doc.kredivo.com/Plugins/Magento/v.2.x.x/magento.v2.x.zip
+  install: Download the zip and install into app/code.
+  official: true
+  probed_status: 200
+reference_implementations:
+- name: Example push_uri handler
+  description: Kredivo's published sample implementation of a merchant push-notification endpoint.
+  url: https://doc.kredivo.com/push_uri/example_push_uri.zip
+  official: true
+  probed_status: 200
+community_packages:
+- language: php
+  registry: github
+  name: WPandu/kredivo-php
+  url: https://github.com/WPandu/kredivo-php
+  description: Third-party Kredivo payment gateway API wrapper.
+  official: false
+- language: go
+  registry: github
+  name: Bhinneka/kredivo-go
+  url: https://github.com/Bhinneka/kredivo-go
+  description: Self-described unofficial Kredivo SDK for Go.
+  official: false
+registries_probed:
+- registry: npm
+  result: no first-party package
+- registry: pypi
+  result: no package named kredivo (404)
+- registry: packagist
+  result: no kredivo vendor
+- registry: github-org
+  result: no public Kredivo or FinAccel organization

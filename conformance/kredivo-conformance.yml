@@ -1,0 +1,116 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/kredivo-checkout-openapi.yml, https://doc.kredivo.com/, https://kredivo.com/security-policy/
+api: Kredivo Checkout API
+summary: |
+  Assertions about which cross-cutting industry standards the Kredivo Checkout API conforms to,
+  derived from the transcribed OpenAPI and Kredivo's published documentation and security policy.
+  Kredivo publishes no compliance certifications, no standards conformance claims and no attestation
+  reports on its public surface, so almost every entry below is a documented negative. Negatives are
+  real findings, not gaps in the research.
+standards:
+- id: oauth2
+  conforms: false
+  evidence: |
+    No OAuth 2.0 anywhere in the documented surface. Authentication is a static per-merchant
+    server_key sent in the JSON request body. No authorization endpoint, no token endpoint, no
+    grants, no scopes.
+- id: oidc
+  conforms: false
+  evidence: No OpenID Connect. /.well-known/openid-configuration returned 404 on every Kredivo host probed.
+- id: fapi
+  conforms: false
+  evidence: |
+    No FAPI conformance claim. The API does not meet baseline FAPI preconditions — it uses neither
+    OAuth 2.0 nor mTLS, and there is no request-object signing or sender-constrained token model.
+- id: psd2
+  conforms: false
+  evidence: |
+    Not applicable — Kredivo operates in Indonesia, Vietnam, Thailand and the Philippines, outside
+    the EU PSD2 regime. No open-banking API surface is published.
+- id: json:api
+  conforms: false
+  evidence: |
+    Responses are bespoke flat JSON objects with no type/id/attributes/relationships envelope and no
+    application/vnd.api+json media type.
+- id: rfc9457
+  conforms: false
+  evidence: |
+    Errors are not RFC 9457 problem details. Kredivo returns HTTP 200 with a proprietary
+    {status, error:{kind, code, message}} envelope and never uses application/problem+json. See
+    errors/kredivo-error-codes.yml.
+- id: rfc8594
+  conforms: false
+  evidence: No Sunset or Deprecation headers, and no published deprecation policy. See lifecycle/.
+- id: rfc9116
+  conforms: false
+  evidence: |
+    No /.well-known/security.txt on any Kredivo host (all probed 404 on 2026-07-19). A
+    human-readable security policy with a security@kredivo.com contact exists instead.
+- id: rfc9727
+  conforms: false
+  evidence: No /.well-known/api-catalog published (probed 404).
+- id: pagination
+  conforms: false
+  evidence: |
+    No paged collections exist in the documented surface — no cursor, offset, limit or page
+    parameters. Array responses are small bounded lists returned whole.
+- id: idempotency
+  conforms: partial
+  evidence: |
+    Real but partial and non-standard. Cancellation accepts a merchant-supplied `cancellation_id`
+    (max 60 chars) as an idempotency key, with a fallback uniqueness key of
+    (order_id, cancellation_amount) de-duplicated over a one-hour window; checkout de-duplicates on
+    order_id. There is no `Idempotency-Key` header, the mechanism is per-operation rather than
+    API-wide, and a replayed request returns an error rather than the original response body — so it
+    does not conform to the IETF idempotency-key draft. See conventions/kredivo-conventions.yml.
+- id: openapi
+  conforms: false
+  evidence: |
+    Kredivo publishes no OpenAPI or Swagger document; probes for /openapi.json, /openapi.yaml and
+    /swagger.json on doc.kredivo.com all returned 404. The spec in openapi/ was transcribed by the
+    API Evangelist pipeline from the published HTML documentation.
+- id: asyncapi
+  conforms: false
+  evidence: |
+    No AsyncAPI document (probed 404). A real webhook surface is documented in prose and captured in
+    asyncapi/kredivo-checkout-webhooks.yml.
+- id: webhook_signatures
+  conforms: false
+  evidence: |
+    Push notifications carry no HMAC or signature header. Authenticity is established by a
+    synchronous callback to /kredivo/v2/update with a signature_key.
+- id: tls
+  conforms: true
+  evidence: |
+    All published Kredivo hosts serve over HTTPS. See security/kredivo-domain-security.yml for the
+    probed TLS, HSTS and DNS posture.
+- id: scim
+  conforms: false
+  evidence: Not applicable — no identity or user-provisioning surface.
+- id: odata
+  conforms: false
+  evidence: Not applicable.
+- id: fhir
+  conforms: false
+  evidence: Not applicable — not a healthcare API.
+certifications:
+  published: false
+  evidence: |
+    No SOC 2, ISO 27001, PCI DSS, HIPAA or FedRAMP certification is named anywhere on Kredivo's
+    public developer or security surface. The security policy page (https://kredivo.com/security-policy/)
+    describes controls in prose — two-factor authentication, encryption in transit and at rest,
+    secure storage and backups, DDoS and MITM protection, strict internal access controls — and
+    references a "Security, Privacy and Architecture (SPARC)" document, but names no certification
+    and publishes no attestation report or trust center.
+  note: |
+    Because no certification is named or evidenced, no `Compliance` pointer is emitted in apis.yml.
+    Kredivo entities are licensed and supervised financial institutions in their operating markets
+    (Indonesia's OJK among others), but that regulatory status is not asserted on the developer
+    surface and is not being claimed here.
+regulatory_context:
+  note: |
+    Recorded as context, not as a conformance claim: Kredivo Group's public communications reference
+    OJK (Otoritas Jasa Keuangan, Indonesia's financial services authority) financial-literacy
+    initiatives, and the group operates Krom Bank, a licensed Indonesian bank. No developer-facing
+    regulatory conformance documentation is published.

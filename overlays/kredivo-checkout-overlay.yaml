@@ -1,0 +1,164 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Kredivo Checkout API
+  version: 1.0.0
+  description: |
+    OpenAPI Overlay 1.0.0 capturing the API Evangelist enrichment layered onto the Kredivo Checkout
+    API description. Kredivo publishes no OpenAPI of its own — openapi/kredivo-checkout-openapi.yml
+    was transcribed from the published HTML documentation — so this overlay records the
+    interpretation and agent-readiness annotations added on top of that transcription, keeping them
+    separable from the faithful transcription itself.
+  x-generated: '2026-07-19'
+  x-method: generated
+  x-source: https://doc.kredivo.com/
+extends: ../openapi/kredivo-checkout-openapi.yml
+actions:
+- target: $.info
+  description: Record provenance and the non-standard response contract on the API description.
+  update:
+    x-api-evangelist:
+      enriched: '2026-07-19'
+      artifacts:
+        conventions: conventions/kredivo-conventions.yml
+        errors: errors/kredivo-error-codes.yml
+        decline_codes: errors/kredivo-decline-codes.yml
+        lifecycle: lifecycle/kredivo-lifecycle.yml
+        sandbox: sandbox/kredivo-sandbox.yml
+        authentication: authentication/kredivo-authentication.yml
+        data_model: data-model/kredivo-data-model.yml
+        webhooks: asyncapi/kredivo-checkout-webhooks.yml
+    x-error-contract:
+      http_status_is_not_a_signal: true
+      note: |
+        Kredivo returns HTTP 200 for application errors. Clients must branch on the body `status`
+        field (OK or ERROR), never on the HTTP status code.
+    x-auth-contract:
+      location: request-body
+      field: server_key
+      note: |
+        The credential is a body field, which OpenAPI securitySchemes cannot express. The
+        securitySchemes entry in the base document is documentation only.
+- target: $.paths['/kredivo/v2/checkout_url'].post
+  description: Flag the checkout operation as credit-creating and escalation-gated for agents.
+  update:
+    x-agentic-access:
+      action_class: write
+      consequence: creates a consumer credit obligation
+      autonomous: false
+      escalation: required
+      reversible: partially
+      reversal_operation: cancelTransaction
+    x-idempotency:
+      key_field: transaction_details.order_id
+      scope: natural-key
+      replay_behavior: |
+        A repeated order_id returns status ERROR with "This order is already PROCESSED." rather than
+        replaying the original response.
+    x-async-outcome:
+      note: |
+        The response is NOT the outcome. It returns a redirect_url; the authoritative transaction
+        result arrives asynchronously at push_uri and must be verified via confirmTransaction.
+- target: $.paths['/kredivo/v2/cancel_transaction'].post
+  description: Document the idempotency key and its one-hour fallback window.
+  update:
+    x-agentic-access:
+      action_class: write
+      consequence: moves money
+      autonomous: false
+      escalation: required
+      reversible: false
+    x-idempotency:
+      key_field: cancellation_id
+      max_length: 60
+      fallback_key:
+      - order_id
+      - cancellation_amount
+      fallback_window: PT1H
+      replay_behavior: |
+        Returns status ERROR with "This cancellation_id is already PROCESSED." Kredivo does not
+        replay the original success body.
+      guidance: |
+        Always send an explicit cancellation_id. The implicit fallback key rejects two legitimately
+        identical partial cancellations inside one hour.
+- target: $.paths['/offline/v1/init_checkout'].post
+  description: Flag offline checkout as credit-creating.
+  update:
+    x-agentic-access:
+      action_class: write
+      consequence: creates a consumer credit obligation
+      autonomous: false
+      escalation: required
+    x-async-outcome:
+      note: Outcome arrives at push_uri; verify via confirmTransaction.
+- target: $.paths['/offline/v1/reversal_transaction'].post
+  description: Flag reversal as money-moving.
+  update:
+    x-agentic-access:
+      action_class: write
+      consequence: moves money
+      autonomous: false
+      escalation: required
+- target: $.paths['/kredivo/v2/deactive_user_token'].post
+  description: Flag token deactivation as destructive to a stored consumer credential.
+  update:
+    x-agentic-access:
+      action_class: write
+      consequence: destroys a stored consumer credential
+      autonomous: false
+      escalation: required
+- target: $.paths['/kredivo/v2/get_user_credit_details'].post
+  description: Flag the credit lookup as consumer-financial-data disclosure.
+  update:
+    x-agentic-access:
+      action_class: read
+      consequence: discloses consumer credit data
+      autonomous: false
+      data_sensitivity: personal-financial
+- target: $.paths['/kredivo/transaction/status'].post
+  description: Mark status polling as safely autonomous and note its role as the callback fallback.
+  update:
+    x-agentic-access:
+      action_class: read
+      consequence: none
+      autonomous: true
+    x-reconciliation:
+      note: |
+        Documented fallback when a push notification fails to arrive. Because Kredivo publishes no
+        webhook retry policy, a periodic sweep over unresolved orders using this operation is
+        effectively required for correctness.
+- target: $.paths['/kredivo/v2/payments'].post
+  description: Mark the calculator as safely autonomous.
+  update:
+    x-agentic-access:
+      action_class: read
+      consequence: none
+      autonomous: true
+- target: $.paths['/kredivo/v2/update'].get
+  description: Mark confirmation as the authoritative read and the only valid basis for fulfilment.
+  update:
+    x-agentic-access:
+      action_class: read
+      consequence: none
+      autonomous: true
+    x-verification:
+      note: |
+        This operation is the webhook signature check. Never fulfil an order on the notification
+        payload alone — only on this response.
+- target: $.components.schemas.TransactionStatus.properties.transaction_status
+  description: Mark the only fulfilable state explicitly.
+  update:
+    x-fulfilable-state: settlement
+    x-terminal-states:
+    - settlement
+    - deny
+    - cancel
+    - expire
+    x-decline-catalog: errors/kredivo-decline-codes.yml
+- target: $.components.schemas.ErrorDetail
+  description: Annotate the proprietary error envelope against RFC 9457.
+  update:
+    x-rfc9457: false
+    x-catalog: errors/kredivo-error-codes.yml
+    x-caveat: |
+      error.code is frequently null, forcing clients to match on error.message. Messages appear in
+      both English and Indonesian.

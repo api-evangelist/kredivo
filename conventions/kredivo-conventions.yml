@@ -1,0 +1,191 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+api: Kredivo Checkout API
+spec: openapi/kredivo-checkout-openapi.yml
+summary: |
+  Cross-cutting runtime semantics of the Kredivo Checkout API, harvested from Kredivo's published
+  developer documentation and cross-checked against the transcribed OpenAPI. Kredivo's conventions
+  are unusual for a modern payments API in three ways worth flagging to any integrator: the API key
+  travels in the request body rather than a header, application errors are returned with HTTP 200
+  and signalled by a `status` field, and the authoritative result of a checkout arrives
+  asynchronously by push notification rather than in the response.
+transport:
+  protocol: HTTPS
+  style: RPC-over-HTTP with JSON bodies
+  content_type: application/json
+  verbs:
+    note: |
+      All operations are POST except the confirmation callback GET /kredivo/v2/update. Verbs are not
+      used semantically — paths are named actions (checkout_url, cancel_transaction,
+      deactive_user_token, reversal_transaction), not resources.
+authentication:
+  style: shared secret in request body
+  field: server_key
+  scope: per-merchant, issued by Kredivo
+  header: none
+  oauth: not supported
+  notes: |
+    Every request carries the merchant's `server_key` as a top-level JSON body field. There is no
+    Authorization header, no bearer token, no OAuth and no scope model. Separate keys are issued for
+    sandbox and production. See authentication/kredivo-authentication.yml.
+  cross_reference: authentication/kredivo-authentication.yml
+idempotency:
+  supported: true
+  mechanism: merchant-supplied idempotency key on cancellation, plus natural keys elsewhere
+  header: none
+  field: cancellation_id
+  applies_to:
+  - operation: cancelTransaction
+    path: /kredivo/v2/cancel_transaction
+    key_field: cancellation_id
+    max_length: 60
+    behavior: |
+      `cancellation_id` is the merchant-supplied uniqueness key for a cancellation. One `order_id`
+      may carry several `cancellation_id` values, which is how partial cancellations are made
+      individually replayable.
+    fallback_key:
+    - order_id
+    - cancellation_amount
+    fallback_window: 1 hour
+    fallback_behavior: |
+      When no `cancellation_id` is sent, Kredivo derives the uniqueness key from the pair
+      (order_id, cancellation_amount). A repeat request with that same pair is refused if less than
+      one hour has elapsed since the previous one — a de-duplication window, not a replayed result.
+    replay_response: |
+      A repeat of an already-processed cancellation returns status ERROR with the message
+      "This cancellation_id is already PROCESSED." rather than replaying the original success body.
+  - operation: createCheckoutUrl
+    path: /kredivo/v2/checkout_url
+    key_field: transaction_details.order_id
+    behavior: |
+      `order_id` is the merchant's natural key for a checkout. Re-submitting an order that Kredivo
+      has already processed returns status ERROR with "This order is already PROCESSED."
+  guidance: |
+    Always send an explicit `cancellation_id`. Relying on the implicit (order_id,
+    cancellation_amount) key means two legitimately identical partial cancellations inside one hour
+    — a common real-world case for repeated line-item refunds of the same value — will be rejected.
+  retention: not published
+pagination:
+  supported: false
+  notes: |
+    No documented operation returns a paged collection. The only array-returning responses
+    (`payments` from the calculator, `credit_limit_details` from user credit details) are small
+    bounded lists returned whole. There are no cursor, offset, limit or page parameters anywhere in
+    the documented surface.
+field_expansion:
+  supported: false
+sparse_fieldsets:
+  supported: false
+metadata:
+  supported: true
+  field: metadata
+  scope: createCheckoutUrl only
+  purpose: |
+    Not general-purpose merchant metadata — the `metadata` object carries device and network signals
+    (ip_address, user_agent, device_id, imsi) consumed by Kredivo's Fraud Detection System.
+  free_form: false
+  merchant_fields:
+    note: |
+      For merchant-side correlation Kredivo instead uses named fields — `order_id`,
+      `client_user_key`, `sub_merchant_id`, `terminal_id`, `cancellation_id`, `cancelled_by`.
+request_id_tracing:
+  supported: false
+  correlation_ids:
+  - field: transaction_id
+    issued_by: Kredivo
+    description: Kredivo's identifier for a transaction, returned on checkout and echoed on every callback.
+  - field: order_id
+    issued_by: merchant
+    description: The merchant's own order identifier, echoed back on every status and callback payload.
+  notes: |
+    Kredivo does not publish a per-request trace or correlation header. `transaction_id` and
+    `order_id` are the only durable handles for reconciling a call with support, and should be
+    logged on every request.
+versioning:
+  style: path segment
+  current:
+  - path_prefix: /kredivo/v2/
+    version: v2
+    surface: online checkout, tokenization, cancellation, calculator
+  - path_prefix: /offline/v1/
+    version: v1
+    surface: QR and EDC checkout
+  unversioned:
+  - path: /kredivo/transaction/status
+    note: The transaction status endpoint carries no version segment at all.
+  media_type_versioning: false
+  header_versioning: false
+  notes: |
+    The API is versioned inconsistently — two independently versioned families plus one unversioned
+    path. There is no published version negotiation, no version header, and no published policy for
+    how a new version is introduced or an old one retired.
+  cross_reference: lifecycle/kredivo-lifecycle.yml
+errors:
+  envelope_style: HTTP 200 with status field
+  http_status_semantics: |
+    Kredivo signals application-level failure inside a 200 response body. Clients MUST NOT treat a
+    2xx status code as success — the `status` field is the authority.
+  success_indicator:
+    field: status
+    value: OK
+  failure_indicator:
+    field: status
+    value: ERROR
+  error_object:
+    field: error
+    shape:
+      kind: string — type of error
+      code: integer or null — numeric error code, frequently null
+      message: string — human-readable message, sometimes in Indonesian
+  rfc9457: false
+  problem_json: false
+  casing_inconsistency: |
+    Some responses return the status field capitalised as `Status` (deactivateUserToken,
+    getUserCreditDetails) while others return lowercase `status`. Clients should read both.
+  cross_reference: errors/kredivo-error-codes.yml
+rate_limiting:
+  documented: false
+  headers: none published
+  notes: |
+    Kredivo publishes no rate limits, no quota, and no rate-limit response headers for the Checkout
+    API. Absence of a published limit is not a guarantee of no limit — treat
+    unexplained failures as potentially throttled and back off.
+callbacks:
+  style: push notification to merchant-supplied URI
+  field: push_uri
+  method: HTTP POST
+  confirmation:
+    operation: confirmTransaction
+    path: /kredivo/v2/update
+    verification_field: signature_key
+    description: |
+      The merchant must call back to /kredivo/v2/update with the `transaction_id` and
+      `signature_key` from the notification to verify it originated from Kredivo and to read the
+      authoritative state. There is no HMAC signature header — verification is a round trip.
+  fallback:
+    operation: checkTransactionStatus
+    path: /kredivo/transaction/status
+    description: Documented polling fallback for when a push notification fails to arrive.
+  cross_reference: asyncapi/kredivo-checkout-webhooks.yml
+currency_and_amounts:
+  currency: IDR
+  representation: |
+    Amounts are sent as numbers (double/integer) on requests but returned as decimal strings on
+    responses (e.g. "1500100.00"), so clients must parse defensively. Amounts are in whole rupiah,
+    not minor units.
+  reserved_item_ids:
+    description: |
+      Non-product cart lines use reserved ids in `items[].id` rather than separate fields.
+    values:
+    - shippingfee
+    - adminfee
+    - taxfee
+    - discount
+    - additionalfee
+    - insurancefee
+    - mixpayment
+expiration:
+  field: expiration_time
+  format: epoch seconds
+  default: 24 hours

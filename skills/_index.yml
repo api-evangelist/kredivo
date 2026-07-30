@@ -1,0 +1,67 @@
+generated: '2026-07-19'
+method: generated
+source: openapi/kredivo-checkout-openapi.yml, https://doc.kredivo.com/
+type: AgentSkill
+api: Kredivo Checkout API
+summary: |
+  Packaged Agent Skills for the Kredivo Checkout API, one per marquee merchant flow. Kredivo
+  publishes no skills, no AGENTS.md and no agent-facing artifacts of its own (searched 2026-07-19),
+  so these were generated from the transcribed OpenAPI plus Kredivo's published documentation. Every
+  operationId referenced below exists in openapi/kredivo-checkout-openapi.yml.
+provider_published_skills:
+  exists: false
+  searched:
+  - https://doc.kredivo.com/
+  - https://kredivo.com/
+  - GitHub (no public Kredivo or FinAccel organization)
+skills:
+- name: kredivo-online-checkout
+  file: kredivo-online-checkout.md
+  description: |
+    The 2-click ecommerce flow: price the installment options, initiate the checkout, verify the
+    push notification, and fulfil only on settlement.
+  operations:
+  - calculatePayments
+  - createCheckoutUrl
+  - confirmTransaction
+  - checkTransactionStatus
+- name: kredivo-tokenized-express-checkout
+  file: kredivo-tokenized-express-checkout.md
+  description: |
+    Tokenize a shopper for 0-click purchases, check remaining credit before offering it, fall back
+    to 2-click cleanly on a dead token, and handle deactivation from both merchant and shopper.
+  operations:
+  - createCheckoutUrl
+  - confirmTransaction
+  - getUserCreditDetails
+  - deactivateUserToken
+- name: kredivo-cancellations-and-refunds
+  file: kredivo-cancellations-and-refunds.md
+  description: |
+    Full and partial cancellation without tripping the idempotency guard, computing the cancellable
+    remainder, plus offline EDC reversal.
+  operations:
+  - checkTransactionStatus
+  - cancelTransaction
+  - reverseOfflineTransaction
+- name: kredivo-offline-qr-edc-checkout
+  file: kredivo-offline-qr-edc-checkout.md
+  description: |
+    In-store acceptance via dynamic QR from a POS or an EDC terminal, with the same
+    verify-before-release discipline and reversal handling.
+  operations:
+  - initOfflineCheckout
+  - confirmTransaction
+  - checkTransactionStatus
+  - reverseOfflineTransaction
+cross_cutting_rules:
+  description: Rules every skill above restates because getting them wrong breaks the integration.
+  rules:
+  - HTTP 200 is not success — branch on the body `status` field (OK or ERROR), never the status code.
+  - The credential (`server_key`) travels in the JSON request body, not a header.
+  - The synchronous response is not the outcome — the result arrives asynchronously at `push_uri`.
+  - Never fulfil on a push notification payload; verify with `confirmTransaction` first.
+  - Fulfil only when `transaction_status` is `settlement`.
+  - Always send an explicit `cancellation_id` on a cancellation.
+  - No webhook retry policy is published, so reconcile unresolved orders by polling.
+  - Never surface `fraud_status` or denial reasoning to the shopper.

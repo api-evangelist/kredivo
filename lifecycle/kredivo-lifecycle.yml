@@ -1,0 +1,135 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+api: Kredivo Checkout API
+summary: |
+  Kredivo publishes a real, detailed Service Level Agreement and runs a public Atlassian Statuspage,
+  which is more operational transparency than most BNPL providers in the region. What it does not
+  publish is any versioning or deprecation policy — there is no announced version cadence, no
+  sunset process, and no changelog. The operational posture is strong; the change-management posture
+  is undocumented.
+versioning:
+  style: path segment
+  policy_published: false
+  current_versions:
+  - version: v2
+    path_prefix: /kredivo/v2/
+    surface: online checkout, tokenization, cancellation, installment calculator
+  - version: v1
+    path_prefix: /offline/v1/
+    surface: QR and EDC checkout
+  unversioned_paths:
+  - /kredivo/transaction/status
+  notes: |
+    Two independently versioned families plus one unversioned path, with no published relationship
+    between them. No version header, no media-type versioning, no documented negotiation. The
+    existence of a v2 implies a v1 online surface once existed, but no v1-to-v2 migration guide is
+    published.
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  notes: |
+    No deprecation policy, no notice period, no Sunset or Deprecation response headers, and no
+    documented retirement process. Note the curiosity that every published error example carries the
+    literal `"kind": "deprecated"` in the error envelope — this appears to be an internal artifact
+    of the error type rather than a deprecation signal, and is not explained in the docs.
+changelog:
+  published: false
+  notes: |
+    No dated changelog, release notes or version history is published for the Checkout API. Merchants
+    have no documented way to learn that the API has changed other than direct contact with
+    merchant operations.
+status_page:
+  published: true
+  url: https://status.kredivo.com/
+  platform: Atlassian Statuspage
+  resolved_host: https://finaccel.statuspage.io/
+  probed_status: 200
+  linked_from_docs: true
+sla:
+  published: true
+  source: https://doc.kredivo.com/
+  scope: Kredivo Checkout
+  hosting: Amazon EC2 and Amazon S3
+  uptime_commitment:
+    monthly_uptime_percentage: 99.9
+    basis: commercially reasonable efforts, per calendar month
+  exclusions_from_uptime_calculation:
+  - name: Emergency Downtime
+    definition: |
+      Times where FinAccel becomes aware of a vulnerability which, based on a risk assessment,
+      FinAccel deems to require immediate remediation, making Kredivo Checkout temporarily
+      unavailable while it is addressed.
+  - name: Scheduled Downtime
+    definition: |
+      Periods of server unavailability notified to the merchant three (3) days in advance. Capped at
+      thirty (30) hours of Scheduled Downtime per calendar year.
+  service_discount:
+  - uptime_range: 99.9% to 97.0%
+    remedy: 7 days discount from that month's billing
+  - uptime_range: 97.0% to 95.0%
+    remedy: 14 days discount from that month's billing
+  - uptime_range: below 95.0%
+    remedy: 30 days discount from that month's billing
+  maximum_service_discount: |
+    Aggregate maximum for a single calendar month shall not exceed thirty days of billing.
+  sla_exclusions: |
+    The SLA does not apply to performance issues (i) caused by factors outside FinAccel's reasonable
+    control including force majeure or internet access problems beyond the demarcation point of
+    FinAccel servers; (ii) resulting from actions or inactions of the merchant; or (iii) arising from
+    suspension or termination of the merchant's right to use Kredivo Checkout under the Kredivo
+    Merchant Agreement.
+  support_response_targets:
+    office_hours: 09:00–18:30
+    out_of_hours_note: |
+      On weekends and public holidays, add another 30–60 minutes to both response and resolution
+      times.
+    severities:
+    - severity: Critical
+      definition: |
+        Production server or other mission critical system(s) are down and no workaround is
+        immediately available.
+      examples:
+      - Server down
+      - Connection down
+      - More than 15% of transactions are not processed by Kredivo due to technical issues
+      response_time: 15 minutes
+      resolution_time: 30 minutes
+    - severity: Major
+      definition: Major functionality is severely impaired.
+      examples:
+      - Intermittent connection
+      - Less than 15% of transactions are not processed by Kredivo due to technical issues
+      response_time: 30 minutes
+      resolution_time: 60 minutes
+    - severity: Minor
+      definition: Partial, non-critical loss of functionality.
+      examples:
+      - Unable to access Kredivo Dashboard
+      - Refund error
+      - Missing merchant logo
+      response_time: 30 minutes
+      resolution_time: 120 minutes
+environments:
+  count: 2
+  cross_reference: sandbox/kredivo-sandbox.yml
+support_contacts:
+- purpose: Merchant operations, documentation and sandbox help
+  email: merchops@finaccel.co
+- purpose: Production endpoint request / going live
+  email: merchops@kredivo.com
+- purpose: Consumer support
+  email: support@kredivo.com
+  phone: '+62-855-7467-9098'
+- purpose: Marketing material approval
+  email: successops@finaccel.co
+- purpose: Security
+  email: security@kredivo.com
+gaps:
+- No versioning policy or version-support window.
+- No deprecation policy, notice period, or Sunset/Deprecation headers.
+- No changelog or release notes.
+- No published v1-to-v2 migration guidance for the online checkout surface.

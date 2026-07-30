@@ -1,0 +1,108 @@
+generated: '2026-07-19'
+method: searched
+source: https://doc.kredivo.com/
+api: Kredivo Checkout API
+summary: |
+  Kredivo is a credit-authorization provider, so a checkout can fail for credit and fraud reasons
+  rather than technical ones. Kredivo does not publish a card-style numeric decline-code reference —
+  there is no equivalent of an ISO 8583 response code table. Instead, decline is expressed through
+  two state enums returned on every transaction: `transaction_status` and `fraud_status`. This file
+  catalogues those verbatim, plus the credit-limit surface a merchant can use to avoid a decline
+  before it happens. Codes below are Kredivo's documented enum values, not invented identifiers.
+envelope:
+  fields:
+  - field: transaction_status
+    location: confirmTransaction and checkTransactionStatus responses
+    description: Lifecycle state of the transaction.
+  - field: fraud_status
+    location: confirmTransaction and checkTransactionStatus responses
+    description: Result of Kredivo's Fraud Detection System (FDS) evaluation.
+  note: |
+    A transaction is only fulfilable when `transaction_status` is `settlement`. Any other value —
+    including `pending` — means the merchant must not release goods.
+decline_codes:
+- code: deny
+  field: transaction_status
+  meaning: The transaction has been denied by Kredivo.
+  category: credit_or_risk
+  terminal: true
+  action: |
+    Do not fulfil. Offer the shopper an alternative payment method. Kredivo does not publish a
+    reason breakdown for a denial, so the merchant cannot distinguish insufficient limit from a risk
+    decision from this field alone.
+  masked_to_buyer: |
+    Kredivo does not publish whether or how the denial reason is surfaced to the shopper in the
+    Kredivo-hosted flow. Merchants should not attempt to explain the reason to the buyer.
+- code: deny
+  field: fraud_status
+  meaning: Denied by the Fraud Detection System. The transaction automatically fails.
+  category: fraud
+  terminal: true
+  action: |
+    Do not fulfil. Do not retry the same order — an FDS denial is automatic and re-submitting the
+    identical cart is unlikely to change the outcome. Escalate suspected false positives to
+    merchops@finaccel.co rather than retrying.
+  masked_to_buyer: |
+    Fraud reasoning is deliberately not exposed. Never surface `fraud_status` or any fraud reasoning
+    to the shopper.
+- code: expire
+  field: transaction_status
+  meaning: The shopper did not complete the transaction, so it expired.
+  category: abandonment
+  terminal: true
+  action: |
+    Release any inventory hold and allow the shopper to start a fresh checkout with a new order_id.
+    The expiry window defaults to 24 hours and is controllable per checkout via `expiration_time`.
+- code: pending
+  field: transaction_status
+  meaning: The shopper has not completed the transaction.
+  category: in_flight
+  terminal: false
+  action: |
+    Not a decline — the flow is still open. Keep waiting for the push notification; poll
+    checkTransactionStatus only as a fallback. Do not fulfil on pending.
+- code: cancel
+  field: transaction_status
+  meaning: The transaction has been cancelled by the merchant.
+  category: merchant_initiated
+  terminal: true
+  action: Reconcile against the merchant's own cancellation record. Not a Kredivo decision.
+- code: settlement
+  field: transaction_status
+  meaning: The transaction is successful.
+  category: approved
+  terminal: true
+  action: Fulfil the order. This is the only fulfilable state.
+- code: accept
+  field: fraud_status
+  meaning: Approved by the Fraud Detection System.
+  category: approved
+  terminal: false
+  action: |
+    Necessary but not sufficient — check `transaction_status` is `settlement` before fulfilling.
+pre_authorization_signals:
+  description: |
+    Rather than a decline reason after the fact, Kredivo exposes the shopper's remaining credit
+    before checkout, which is the documented way to avoid an avoidable decline.
+  operation: getUserCreditDetails
+  path: /kredivo/v2/get_user_credit_details
+  fields:
+  - field: account_status
+    type: integer
+    note: Documented by example only (value 1); the value vocabulary is not published.
+  - field: account_type
+    type: integer
+    note: Documented by example only (value 2); the value vocabulary is not published.
+  - field: credit_limit_details[].remaining_user_limit
+    type: string
+    description: Remaining limit for the shopper, broken down per installment tenure.
+  guidance: |
+    For tokenized shoppers, call getUserCreditDetails before rendering Kredivo as an option and hide
+    tenures whose `remaining_user_limit` is below the cart total. This converts a hard decline into a
+    quiet non-offer.
+gaps:
+- No numeric decline-code table is published.
+- A `deny` on transaction_status carries no reason code, so credit and risk declines are indistinguishable.
+- The `account_status` and `account_type` integer vocabularies are undocumented.
+- No published guidance on retry eligibility or soft-vs-hard decline classification.
+cross_reference: errors/kredivo-error-codes.yml

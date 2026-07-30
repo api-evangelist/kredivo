@@ -1,0 +1,258 @@
+generated: '2026-07-19'
+method: derived
+source: openapi/kredivo-checkout-openapi.yml
+api: Kredivo Checkout API
+summary: |
+  Entity-relationship graph derived from the $ref structure and id-reference fields of the
+  transcribed OpenAPI. Kredivo's model is small and transaction-centric: a Transaction anchors
+  everything, identified by two parallel keys — Kredivo's `transaction_id` and the merchant's
+  `order_id` — and the only long-lived entity is the tokenized User.
+identifiers:
+  note: |
+    Kredivo uses no prefixed or typed identifiers (no `txn_`/`cus_` style scheme). Ids are bare
+    strings whose type must be inferred from the field name.
+  keys:
+  - field: transaction_id
+    issued_by: Kredivo
+    format: UUID (per every published example)
+    example: bb0380d7-2688-4e73-a668-997f3fc5cbec
+  - field: order_id
+    issued_by: merchant
+    format: opaque merchant string
+    example: KB-0c40f395
+    note: The merchant's natural key, echoed on every status and callback payload.
+  - field: user_token
+    issued_by: Kredivo
+    format: opaque string
+    note: Long-lived handle for a tokenized shopper. The only cross-transaction identifier.
+  - field: client_user_key
+    issued_by: merchant
+    format: opaque merchant string (email in published examples)
+    note: The merchant's own identifier for the shopper, paired with user_token at tokenization.
+  - field: cancellation_id
+    issued_by: merchant
+    max_length: 60
+    note: Idempotency key for a cancellation. One order_id may carry several.
+  - field: sub_merchant_id
+    issued_by: merchant
+    note: Outlet / sub-merchant identifier, used by the offline (QR and EDC) surface.
+  - field: terminal_id
+    issued_by: merchant
+    note: EDC device identifier.
+  - field: signature_key
+    issued_by: Kredivo
+    note: Per-notification verification token, not an entity identifier.
+entities:
+- name: Merchant
+  description: The integrating business, identified implicitly by its server_key.
+  identified_by: server_key
+  schema: null
+  note: Never returned as an object — the merchant is only ever implied by the credential.
+  relationships:
+  - type: has_many
+    target: Transaction
+    via: server_key
+  - type: has_many
+    target: SubMerchant
+    via: sub_merchant_id
+- name: SubMerchant
+  description: An outlet or store location within a merchant, used by QR and EDC checkout.
+  identified_by: sub_merchant_id
+  schema: null
+  note: Not modelled as a schema — appears only as a scalar field on offline requests and callbacks.
+  relationships:
+  - type: belongs_to
+    target: Merchant
+  - type: has_many
+    target: Transaction
+    via: sub_merchant_id
+- name: Transaction
+  description: |
+    The central entity. Created by a checkout operation, carried through an asynchronous push
+    notification, and read back via confirmation or status polling.
+  identified_by: transaction_id
+  alternate_key: order_id
+  schema: TransactionStatus
+  states:
+    field: transaction_status
+    values:
+    - settlement
+    - pending
+    - deny
+    - cancel
+    - expire
+  relationships:
+  - type: belongs_to
+    target: Merchant
+    via: server_key
+  - type: has_one
+    target: TransactionDetails
+    via: transaction_details
+  - type: has_one
+    target: Customer
+    via: customer_details
+  - type: has_many
+    target: ProductItem
+    via: transaction_details.items
+  - type: has_many
+    target: Seller
+    via: sellers
+  - type: has_one
+    target: Address
+    via: billing_address
+  - type: has_one
+    target: Address
+    via: shipping_address
+  - type: has_one
+    target: Metadata
+    via: metadata
+  - type: has_one
+    target: User
+    via: user_token
+  - type: has_many
+    target: Cancellation
+    via: cancellation_id
+  - type: has_one
+    target: PaymentType
+    via: payment_type
+- name: TransactionDetails
+  description: The cart — order id, total amount and line items.
+  schema: TransactionDetails
+  relationships:
+  - type: belongs_to
+    target: Transaction
+  - type: has_many
+    target: ProductItem
+    via: items
+- name: ProductItem
+  description: |
+    A cart line. Doubles as the carrier for non-product amounts through reserved ids —
+    shippingfee, adminfee, taxfee, discount, additionalfee, insurancefee, mixpayment.
+  schema: ProductItem
+  identified_by: id
+  relationships:
+  - type: belongs_to
+    target: TransactionDetails
+  - type: belongs_to
+    target: Seller
+    via: parent_id
+    condition: parent_type == "SELLER"
+    note: |
+      Self-referential-ish polymorphic parent — parent_type selects whether parent_id points at a
+      Seller or at another ProductItem.
+  - type: belongs_to
+    target: ProductItem
+    via: parent_id
+    condition: parent_type == "ITEM"
+- name: Seller
+  description: A marketplace seller. Required when the merchant operates a marketplace.
+  schema: Seller
+  identified_by: id
+  relationships:
+  - type: belongs_to
+    target: Transaction
+  - type: has_one
+    target: Address
+    via: address
+  - type: has_many
+    target: ProductItem
+    via: parent_id
+- name: Customer
+  description: The shopper's contact identity for this transaction. Not a persistent entity.
+  schema: Customer
+  identified_by: email
+  relationships:
+  - type: belongs_to
+    target: Transaction
+- name: Address
+  description: Shared shape used for billing address, shipping address and seller address.
+  schema: Address
+  relationships:
+  - type: belongs_to
+    target: Transaction
+  - type: belongs_to
+    target: Seller
+- name: Metadata
+  description: Device and network signals consumed by Kredivo's Fraud Detection System.
+  schema: Metadata
+  relationships:
+  - type: belongs_to
+    target: Transaction
+- name: User
+  description: |
+    A tokenized shopper — the only entity that persists across transactions. Created by
+    tokenize_user on checkout, addressed thereafter by user_token, and destroyed by
+    deactivateUserToken or by the shopper in the Kredivo app.
+  identified_by: user_token
+  alternate_key: client_user_key
+  schema: UserCreditDetailsResponse
+  lifecycle:
+  - created: createCheckoutUrl with tokenize_user true and a client_user_key
+  - read: getUserCreditDetails
+  - destroyed: deactivateUserToken, or shopper-initiated in the Kredivo app
+  relationships:
+  - type: has_many
+    target: Transaction
+    via: user_token
+  - type: has_one
+    target: CreditProfile
+    via: user_credit_details
+- name: CreditProfile
+  description: A tokenized shopper's account status, account type and remaining limit per tenure.
+  schema: UserCreditDetailsResponse.user_credit_details
+  relationships:
+  - type: belongs_to
+    target: User
+  - type: has_many
+    target: CreditLimit
+    via: credit_limit_details
+- name: CreditLimit
+  description: Remaining credit for one installment tenure.
+  schema: UserCreditDetailsResponse.user_credit_details.credit_limit_details[]
+  relationships:
+  - type: belongs_to
+    target: CreditProfile
+  - type: has_one
+    target: PaymentType
+    via: payment_type
+- name: PaymentType
+  description: |
+    An installment tenure. A closed enum rather than a resource, but referenced widely enough to be
+    worth naming: 30_days, 3_months, 6_months, 9_months, 12_months, 18_months, 24_months.
+  schema: PaymentType
+  identified_by: enum value
+  relationships:
+  - type: belongs_to
+    target: Transaction
+  - type: belongs_to
+    target: CreditLimit
+  - type: belongs_to
+    target: PaymentOption
+- name: PaymentOption
+  description: |
+    A priced installment option returned by the calculator — tenure, interest rate, service fee,
+    monthly installment and total.
+  schema: PaymentsResponse.payments[]
+  identified_by: id
+  relationships:
+  - type: has_one
+    target: PaymentType
+    via: id
+- name: Cancellation
+  description: |
+    A full or partial cancellation against a transaction. Not readable — there is no operation to
+    list or retrieve cancellations, only to create one.
+  identified_by: cancellation_id
+  schema: CancelTransactionRequest
+  write_only: true
+  relationships:
+  - type: belongs_to
+    target: Transaction
+    via: transaction_id
+gaps:
+- No identifier prefixing scheme, so ids are not self-describing.
+- Merchant and SubMerchant are never returned as objects — they exist only as scalar fields.
+- Cancellations are write-only; there is no operation to list or retrieve them.
+- No operation lists transactions — every read requires a known order_id or transaction_id.
+- The account_status and account_type integer vocabularies on CreditProfile are undocumented.
+render: null

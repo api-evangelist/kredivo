@@ -1,0 +1,22 @@
+{
+  "provider": "kredivo",
+  "sources": [
+    "kredivo-calculator-api-openapi.yml",
+    "kredivo-checkout-api-openapi.yml",
+    "kredivo-confirmation-api-openapi.yml",
+    "kredivo-tokenization-api-openapi.yml",
+    "kredivo-transactions-api-openapi.yml"
+  ],
+  "outputs": [
+    "kredivo-calculator-api-openapi.yml",
+    "kredivo-checkout-api-openapi.yml",
+    "kredivo-confirmation-api-openapi.yml",
+    "kredivo-tokenization-api-openapi.yml",
+    "kredivo-transactions-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
