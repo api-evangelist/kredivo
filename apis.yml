@@ -1,25 +1,196 @@
 aid: kredivo
 name: Kredivo
-description: Kredivo is a company surfaced as a portfolio company of 500-global and added to the API Evangelist
-  network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: Kredivo is a Southeast Asian consumer credit platform operated by FinAccel (Kredivo Group), best
+  known for its "Buy Now, Pay Later" product offering instant real-time credit decisioning for online and
+  offline purchases across Indonesia, Vietnam, Thailand and the Philippines. For developers, Kredivo publishes
+  the Kredivo Checkout API — a merchant-facing HTTP/JSON payment API that lets an ecommerce store, marketplace,
+  POS or EDC terminal offer installment payment (30 days through 24 months) at checkout. The API covers 2-click
+  redirect checkout, 0-click tokenized express checkout, dynamic and static QR checkout for physical stores, EDC
+  terminal checkout, transaction status polling, full and partial cancellation, user credit-limit lookup, and an
+  installment/interest calculator, with asynchronous push notifications to a merchant-supplied push_uri and a
+  signature-key confirmation callback. Kredivo Group also operates KrediFazz (instant cash loans), Krom (digital
+  bank), Timo and GajiGesa.
 url: https://raw.githubusercontent.com/api-evangelist/kredivo/refs/heads/main/apis.yml
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://doc.kredivo.com/images/logo.png
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - 500-global
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-tier: producer
+x-tier-reason: publishes a documented public merchant checkout API with sandbox, plugins and an SLA
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-19'
 tags:
 - Company
-apis: []
+- Payments
+- Buy Now Pay Later
+- BNPL
+- Lending
+- Consumer Credit
+- Checkout
+- Fintech
+- Ecommerce
+- Indonesia
+- Southeast Asia
+- Financial Services
+apis:
+- aid: kredivo:kredivo-calculator-api
+  name: Kredivo Calculator API
+  description: Installment, interest and service-fee breakdown.
+  humanURL: https://doc.kredivo.com/
+  baseURL: https://sandbox.kredivo.com
+  tags:
+  - Calculator
+  properties:
+  - type: OpenAPI
+    url: openapi/kredivo-calculator-api-openapi.yml
+  - type: Documentation
+    url: https://doc.kredivo.com/
+  - type: Webhooks
+    url: asyncapi/kredivo-checkout-webhooks.yml
+- aid: kredivo:kredivo-checkout-api
+  name: Kredivo Checkout API
+  description: Initiating a Kredivo installment checkout (2-click, 0-click, QR, EDC).
+  humanURL: https://doc.kredivo.com/
+  baseURL: https://sandbox.kredivo.com
+  tags:
+  - Checkout
+  properties:
+  - type: OpenAPI
+    url: openapi/kredivo-checkout-api-openapi.yml
+  - type: Documentation
+    url: https://doc.kredivo.com/
+  - type: Webhooks
+    url: asyncapi/kredivo-checkout-webhooks.yml
+- aid: kredivo:kredivo-confirmation-api
+  name: Kredivo Confirmation API
+  description: Confirming a transaction after a push notification.
+  humanURL: https://doc.kredivo.com/
+  baseURL: https://sandbox.kredivo.com
+  tags:
+  - Confirmation
+  properties:
+  - type: OpenAPI
+    url: openapi/kredivo-confirmation-api-openapi.yml
+  - type: Documentation
+    url: https://doc.kredivo.com/
+  - type: Webhooks
+    url: asyncapi/kredivo-checkout-webhooks.yml
+- aid: kredivo:kredivo-tokenization-api
+  name: Kredivo Tokenization API
+  description: Managing tokenized (0-click) shoppers and their credit limits.
+  humanURL: https://doc.kredivo.com/
+  baseURL: https://sandbox.kredivo.com
+  tags:
+  - Tokenization
+  properties:
+  - type: OpenAPI
+    url: openapi/kredivo-tokenization-api-openapi.yml
+  - type: Documentation
+    url: https://doc.kredivo.com/
+  - type: Webhooks
+    url: asyncapi/kredivo-checkout-webhooks.yml
+- aid: kredivo:kredivo-transactions-api
+  name: Kredivo Transactions API
+  description: Status, cancellation and reversal of transactions.
+  humanURL: https://doc.kredivo.com/
+  baseURL: https://sandbox.kredivo.com
+  tags:
+  - Transactions
+  properties:
+  - type: OpenAPI
+    url: openapi/kredivo-transactions-api-openapi.yml
+  - type: Documentation
+    url: https://doc.kredivo.com/
+  - type: Webhooks
+    url: asyncapi/kredivo-checkout-webhooks.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DomainSecurity
+  url: security/kredivo-domain-security.yml
+- type: VulnerabilityDisclosure
+  url: security/kredivo-vulnerability-disclosure.yml
+- type: Security
+  url: security/kredivo-vulnerability-disclosure.yml
 - type: Website
   url: https://finaccel.co
+- type: CorporateWebsite
+  url: https://kredivocorp.com/
+- type: DeveloperPortal
+  url: https://doc.kredivo.com/
+- type: Documentation
+  url: https://doc.kredivo.com/
+- type: APIReference
+  url: https://doc.kredivo.com/
+- type: GettingStarted
+  url: https://doc.kredivo.com/
+- type: Blog
+  url: https://blog.kredivo.com/
+- type: Support
+  url: https://kredivo.com/faqs/
+- type: SignUp
+  url: https://kredivo.com/merchant/
+- type: TermsOfService
+  url: https://kredivo.com/p/in/tos.html
+- type: PrivacyPolicy
+  url: https://kredivo.com/p/in/privacy.html
+- type: SecurityPolicy
+  url: https://kredivo.com/security-policy/
+- type: StatusPage
+  url: https://status.kredivo.com/
+- type: Partners
+  url: https://kredivo.com/p/partners.html
+- type: Packages
+  url: packages/kredivo-packages.yml
+- type: SDKs
+  url: packages/kredivo-packages.yml
+- type: Authentication
+  url: authentication/kredivo-authentication.yml
+- type: Conventions
+  url: conventions/kredivo-conventions.yml
+- type: Idempotency
+  url: conventions/kredivo-conventions.yml
+- type: ErrorCatalog
+  url: errors/kredivo-error-codes.yml
+- type: DeclineCodes
+  url: errors/kredivo-decline-codes.yml
+- type: Lifecycle
+  url: lifecycle/kredivo-lifecycle.yml
+- type: Sandbox
+  url: sandbox/kredivo-sandbox.yml
+- type: DataModel
+  url: data-model/kredivo-data-model.yml
+- type: Conformance
+  url: conformance/kredivo-conformance.yml
+- type: WellKnown
+  url: well-known/kredivo-well-known.yml
+- type: LLMsTxt
+  url: llms/kredivo-llms.txt
+- type: MCPServer
+  url: mcp/kredivo-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Webhooks
+  url: asyncapi/kredivo-checkout-webhooks.yml
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence
