@@ -1,0 +1,43 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Kredivo Checkout Calculator Confirmation API",
+    "version": "v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Confirmation",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Confirm a transaction from a push notification",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://sandbox.kredivo.com/kredivo/v2/update",
+            "params": [
+              {
+                "name": "transaction_id",
+                "value": "bb0380d7-2688-4e73-a668-997f3fc5cbec",
+                "type": "query",
+                "description": "Transaction ID given by Kredivo."
+              },
+              {
+                "name": "signature_key",
+                "value": "",
+                "type": "query",
+                "description": "Signature key used to validate that the notification originated from Kredivo."
+              }
+            ]
+          },
+          "docs": "Called by the merchant in response to a push notification delivered to `push_uri`, to\nvalidate that the notification really originated from Kredivo and to read the authoritative\ntransaction state. Both the `transaction_id` and the `signature_key` come from the\nnotification payload.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

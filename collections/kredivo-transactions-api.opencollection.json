@@ -1,0 +1,63 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Kredivo Checkout Calculator Transactions API",
+    "version": "v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Transactions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Reverse an offline (EDC) transaction",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/offline/v1/reversal_transaction",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Reverses an offline transaction that has not completed, identified by `order_id`."
+        },
+        {
+          "info": {
+            "name": "Check a transaction's status by order ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/kredivo/transaction/status",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Polls the authoritative state of a transaction by merchant `order_id`. Documented as the\nfallback when a push notification to `push_uri` fails to arrive.\n"
+        },
+        {
+          "info": {
+            "name": "Cancel a transaction in full or in part",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/kredivo/v2/cancel_transaction",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Cancels a transaction. Omitting `cancellation_amount`, or passing an amount equal to the\ntransaction amount, is a full cancellation; a smaller amount is a partial cancellation. An\namount larger than the remaining cancellable amount, or zero or negative, is rejected.\n\n`cancellation_id` is the merchant-supplied idempotency key for this operation: one order ID\nmay carry several cancellation IDs. When no `cancellation_id` is sent, Kredivo uses the pair\n(`order_id`, `cancellation_amount`) as the uniq"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

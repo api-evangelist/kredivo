@@ -1,0 +1,128 @@
+{
+  "item": [
+    {
+      "id": "600f616e-da11-4d02-83d9-dd4fad01541b",
+      "name": "Confirmation",
+      "description": {
+        "content": "Confirming a transaction after a push notification.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "d39bf38e-c978-4106-85ff-a6588f98511e",
+          "name": "Confirm a transaction from a push notification",
+          "request": {
+            "name": "Confirm a transaction from a push notification",
+            "description": {
+              "content": "Called by the merchant in response to a push notification delivered to `push_uri`, to\nvalidate that the notification really originated from Kredivo and to read the authoritative\ntransaction state. Both the `transaction_id` and the `signature_key` come from the\nnotification payload.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "kredivo",
+                "v2",
+                "update"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "transaction_id",
+                  "value": "<string>",
+                  "description": "(Required) Transaction ID given by Kredivo."
+                },
+                {
+                  "disabled": false,
+                  "key": "signature_key",
+                  "value": "<string>",
+                  "description": "(Required) Signature key used to validate that the notification originated from Kredivo."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "ec7f76e3-5d37-4f79-8d24-29c862cefd3b",
+              "name": "Authoritative transaction state.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "kredivo",
+                    "v2",
+                    "update"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "transaction_id",
+                      "value": "bb0380d7-2688-4e73-a668-997f3fc5cbec"
+                    },
+                    {
+                      "key": "signature_key",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"OK\",\n  \"legal_name\": \"TANDRA\",\n  \"fraud_status\": \"accept\",\n  \"order_id\": \"KD125262\",\n  \"transaction_time\": 1501846094,\n  \"amount\": \"1500100.00\",\n  \"payment_type\": \"30_days\",\n  \"transaction_status\": \"settlement\",\n  \"message\": \"Confirmed order status. Valid!\",\n  \"transaction_id\": \"fadee4e5-99a2-48d6-952d-007f3fa508e8\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.kredivo.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "5b9272fa-d585-43dd-ab09-75c314f68ca6",
+    "name": "Kredivo Checkout Calculator Confirmation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Kredivo Checkout API lets an ecommerce store, marketplace, POS or EDC terminal offer\nKredivo installment payment at checkout.\n\nSurfaces documented by Kredivo:\n\n* **2-click Checkout** — merchant posts the cart, receives a `redirect_url`, and sends the\n  shopper to Kredivo to authenticate with phone + PIN + OTP.\n* **0-click Checkout** — once a shopper is tokenized (`tokenize_user: true` /\n  `client_user_key`), later purchases are placed with the stored `user_token`.\n* **QR Checkout** — dynamic (per-transaction) or static (per-store) QR for physical stores.\n* **EDC Checkout** — checkout initiated from a physical EDC terminal, with reversal support.\n* **Additional APIs** — transaction status, full/partial cancellation, and an installment\n  and interest calculator.\n\nEvery operation authenticates with the per-merchant `server_key` carried **in the JSON\nrequest body**, not in a header. Transaction outcomes arrive asynchronously as an HTTP POST\nto the merchant's `push_uri`; the merchant confirms by calling `GET /kredivo/v2/update`\nwith the `transaction_id` and `signature_key` from the notification.\n\nThis description was generated by the API Evangelist enrichment pipeline from Kredivo's\npublished developer documentation at https://doc.kredivo.com/. It is a faithful\ntranscription of the documented request/response surface — it is not published by Kredivo.\n\n\nContact Support:\n Name: Kredivo Merchant Operations\n Email: merchops@finaccel.co",
+      "type": "text/plain"
+    }
+  }
+}

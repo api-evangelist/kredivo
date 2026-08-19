@@ -1,0 +1,48 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Kredivo Checkout Calculator Tokenization API",
+    "version": "v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Tokenization",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Deactivate a tokenized user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/kredivo/v2/deactive_user_token",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Invalidates a `user_token`, ending 0-click eligibility for that shopper. A shopper can also\ndeactivate a tokenized account from the Kredivo app, in which case Kredivo sends a push\nnotification to a merchant endpoint registered with Kredivo so the merchant can invalidate\nthe token on its side.\n"
+        },
+        {
+          "info": {
+            "name": "Get a tokenized user's remaining credit limit",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/kredivo/v2/get_user_credit_details",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Returns the remaining limit, account status and account type of a tokenized shopper, broken\ndown per installment tenure. Requires a valid `user_token`.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

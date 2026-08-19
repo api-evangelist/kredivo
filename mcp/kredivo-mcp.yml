@@ -2,12 +2,18 @@ generated: '2026-07-19'
 method: derived
 status: candidate
 source: openapi/kredivo-checkout-openapi.yml
-summary: |
-  Kredivo publishes no MCP server. Searches of the developer documentation, the MCP registries and
+summary: 'Kredivo publishes no MCP server. Searches of the developer documentation, the MCP registries
+  and
+
   npm found no official or community Kredivo MCP server, and Kredivo has no public GitHub
+
   organization. The tool list below is a CANDIDATE surface derived one-to-one from the operations in
+
   the transcribed OpenAPI — it describes what a Kredivo MCP server could expose, and is not a
+
   published or running server.
+
+  '
 published_server:
   exists: false
   searched:
@@ -20,11 +26,15 @@ server:
   url: null
   note: No hosted endpoint exists. Populate only if Kredivo publishes one.
 safety:
-  note: |
-    This is a payments API that moves real consumer credit. Any agent-facing exposure should treat
+  note: 'This is a payments API that moves real consumer credit. Any agent-facing exposure should treat
+
     the write operations below as escalation-gated: initiating a checkout creates a credit
+
     obligation for a consumer, and cancelling or reversing a transaction moves money. Only the read
+
     operations are safely autonomous.
+
+    '
 tools:
 - name: calculate_payments
   description: Calculate the available Kredivo installment options, interest and fees for a cart.
@@ -39,26 +49,34 @@ tools:
   consequence: none
   autonomous: true
 - name: confirm_transaction
-  description: |
-    Verify a Kredivo push notification and read the authoritative transaction state, using the
+  description: 'Verify a Kredivo push notification and read the authoritative transaction state, using
+    the
+
     transaction id and signature key from the notification.
+
+    '
   source_operation: openapi/kredivo-checkout-openapi.yml#confirmTransaction
   action_class: read
   consequence: none
   autonomous: true
 - name: get_user_credit_details
-  description: |
-    Read a tokenized shopper's account status, account type and remaining credit limit per
+  description: 'Read a tokenized shopper''s account status, account type and remaining credit limit per
+
     installment tenure.
+
+    '
   source_operation: openapi/kredivo-checkout-openapi.yml#getUserCreditDetails
   action_class: read
   consequence: discloses consumer credit data
   autonomous: false
   note: Returns personal financial data about an identified consumer — gate on consent.
 - name: create_checkout_url
-  description: |
-    Initiate a Kredivo 2-click or 0-click installment checkout for a cart and return the redirect URL
+  description: 'Initiate a Kredivo 2-click or 0-click installment checkout for a cart and return the redirect
+    URL
+
     for the shopper.
+
+    '
   source_operation: openapi/kredivo-checkout-openapi.yml#createCheckoutUrl
   action_class: write
   consequence: creates a consumer credit obligation
@@ -80,10 +98,13 @@ tools:
   escalation: required
   idempotency:
     key_field: cancellation_id
-    note: |
-      An agent MUST supply an explicit cancellation_id. Without one, Kredivo de-duplicates on
+    note: 'An agent MUST supply an explicit cancellation_id. Without one, Kredivo de-duplicates on
+
       (order_id, cancellation_amount) over a one-hour window, which will silently reject a second
+
       legitimate partial cancellation of the same value.
+
+      '
 - name: reverse_offline_transaction
   description: Reverse an incomplete offline (EDC) transaction by order id.
   source_operation: openapi/kredivo-checkout-openapi.yml#reverseOfflineTransaction
@@ -101,8 +122,18 @@ tools:
 credential:
   field: server_key
   location: request body
-  note: |
-    Every tool call must carry the merchant server_key in the JSON body. There is no header-based
+  note: 'Every tool call must carry the merchant server_key in the JSON body. There is no header-based
+
     auth and no scoped token, so a Kredivo MCP server would hold a single all-powerful merchant
+
     credential with no way to grant an agent a reduced-privilege subset. That is the central
+
     security consideration for any agentic exposure of this API.
+
+    '
+deployment:
+  mode: none
+  verified: derived
+  tools: 9
+  checked: '2026-08-12'
+  source: catalog MCP census

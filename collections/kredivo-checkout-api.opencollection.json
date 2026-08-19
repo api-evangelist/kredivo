@@ -1,0 +1,48 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Kredivo Calculator Checkout API",
+    "version": "v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Checkout",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Initiate a 2-click or 0-click checkout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/kredivo/v2/checkout_url",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a Kredivo checkout for the supplied cart and returns a `redirect_url` the merchant\nsends the shopper to. Set `tokenize_user: true` with a `client_user_key` to tokenize the\nshopper for later 0-click purchases; supply an existing `user_token` to attempt a 0-click\npurchase. If the `user_token` is invalid the response still carries a `redirect_url` that\nthe merchant should follow to fall back to regular 2-click checkout.\n"
+        },
+        {
+          "info": {
+            "name": "Initiate a QR or EDC checkout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/offline/v1/init_checkout",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Initiates an offline (physical store) checkout. With `source: \"QR\"` Kredivo returns a\ndynamic QR code — as an image URL or as a string, selected by `qr_type` — that the shopper\nscans in the Kredivo app. With `source: \"EDC Mobile\"` the checkout is initiated from an EDC\nterminal against the shopper's `mobile_number`.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

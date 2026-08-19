@@ -1,0 +1,222 @@
+{
+  "item": [
+    {
+      "id": "1ef65f92-ab93-4bbf-ba66-7ab3e08e65b3",
+      "name": "Tokenization",
+      "description": {
+        "content": "Managing tokenized (0-click) shoppers and their credit limits.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "c7e802be-8afb-425d-8e55-b4efa45f3dcb",
+          "name": "Deactivate a tokenized user",
+          "request": {
+            "name": "Deactivate a tokenized user",
+            "description": {
+              "content": "Invalidates a `user_token`, ending 0-click eligibility for that shopper. A shopper can also\ndeactivate a tokenized account from the Kredivo app, in which case Kredivo sends a push\nnotification to a merchant endpoint registered with Kredivo so the merchant can invalidate\nthe token on its side.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "kredivo",
+                "v2",
+                "deactive_user_token"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"server_key\": \"<string>\",\n  \"user_token\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "7fcdc9e9-ccf5-4d01-80c1-a3a4333a525d",
+              "name": "Token deactivation result.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "kredivo",
+                    "v2",
+                    "deactive_user_token"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"server_key\": \"ABCD-XXXX-1234\",\n  \"user_token\": \"XXXX-YYYY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"Status\": \"OK\",\n  \"user_token\": \"XXXX-YYYY\",\n  \"is_active\": false,\n  \"remarks\": \"deactive user successful\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "cdce5392-b1ac-4469-8e31-2d7e7b0d88d8",
+          "name": "Get a tokenized user's remaining credit limit",
+          "request": {
+            "name": "Get a tokenized user's remaining credit limit",
+            "description": {
+              "content": "Returns the remaining limit, account status and account type of a tokenized shopper, broken\ndown per installment tenure. Requires a valid `user_token`.\n",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "kredivo",
+                "v2",
+                "get_user_credit_details"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"server_key\": \"<string>\",\n  \"user_token\": \"<string>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "e07db0ff-ce33-433a-aee0-a76ec8d881a6",
+              "name": "Shopper identity and per-tenure remaining credit limits.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "kredivo",
+                    "v2",
+                    "get_user_credit_details"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"server_key\": \"ABCD-XXXX-1234\",\n  \"user_token\": \"XXXX-YYYY\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"Status\": \"OK\",\n  \"user_details\": {\n    \"legal_name\": \"Rangge Septyo\",\n    \"mobile_number\": \"62812xxxx0581\"\n  },\n  \"user_credit_details\": {\n    \"account_status\": 1,\n    \"account_type\": 2,\n    \"credit_limit_details\": [\n      {\n        \"payment_type\": \"30_days\",\n        \"remaining_user_limit\": \"1500000\"\n      },\n      {\n        \"payment_type\": \"3_months\",\n        \"remaining_user_limit\": \"4500000\"\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://sandbox.kredivo.com",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "acccb869-10aa-4443-83c9-a4acd2ea05a5",
+    "name": "Kredivo Checkout Calculator Tokenization API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Kredivo Checkout API lets an ecommerce store, marketplace, POS or EDC terminal offer\nKredivo installment payment at checkout.\n\nSurfaces documented by Kredivo:\n\n* **2-click Checkout** — merchant posts the cart, receives a `redirect_url`, and sends the\n  shopper to Kredivo to authenticate with phone + PIN + OTP.\n* **0-click Checkout** — once a shopper is tokenized (`tokenize_user: true` /\n  `client_user_key`), later purchases are placed with the stored `user_token`.\n* **QR Checkout** — dynamic (per-transaction) or static (per-store) QR for physical stores.\n* **EDC Checkout** — checkout initiated from a physical EDC terminal, with reversal support.\n* **Additional APIs** — transaction status, full/partial cancellation, and an installment\n  and interest calculator.\n\nEvery operation authenticates with the per-merchant `server_key` carried **in the JSON\nrequest body**, not in a header. Transaction outcomes arrive asynchronously as an HTTP POST\nto the merchant's `push_uri`; the merchant confirms by calling `GET /kredivo/v2/update`\nwith the `transaction_id` and `signature_key` from the notification.\n\nThis description was generated by the API Evangelist enrichment pipeline from Kredivo's\npublished developer documentation at https://doc.kredivo.com/. It is a faithful\ntranscription of the documented request/response surface — it is not published by Kredivo.\n\n\nContact Support:\n Name: Kredivo Merchant Operations\n Email: merchops@finaccel.co",
+      "type": "text/plain"
+    }
+  }
+}

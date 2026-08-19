@@ -1,0 +1,33 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Kredivo Checkout Calculator API",
+    "version": "v2"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Calculator",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Calculate installment options for a cart",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://sandbox.kredivo.com/kredivo/v2/payments",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Returns the available payment types for a cart with their full cost breakdown — tenure,\ninterest rate, service fee, monthly installment and total amount — so the merchant can\nrender Kredivo's installment options before checkout.\n"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
