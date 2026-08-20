@@ -42,6 +42,19 @@ tags:
 - Consumer Credit
 - Checkout
 - Fintech
+- E-Commerce
+- Indonesia
+- Southeast Asia
+- Financial-Services
+tags_raw:
+- Company
+- Payments
+- Buy Now Pay Later
+- BNPL
+- Lending
+- Consumer Credit
+- Checkout
+- Fintech
 - Ecommerce
 - Indonesia
 - Southeast Asia
@@ -109,6 +122,8 @@ apis:
   humanURL: https://doc.kredivo.com/
   baseURL: https://sandbox.kredivo.com
   tags:
+  - Transaction
+  tags_raw:
   - Transactions
   properties:
   - type: OpenAPI
