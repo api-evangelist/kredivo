@@ -150,6 +150,9 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: CapabilityMap
+  url: capabilities/kredivo-capability-edges.yml
+  name: Kredivo Business Capability Map
 - type: Overlay
   url: overlays/kredivo-checkout-overlay.yaml
 - type: DomainSecurity

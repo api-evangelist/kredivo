@@ -1,0 +1,37 @@
+slug: kredivo
+provider: Kredivo
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Banking & Capital Markets
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 2
+edges:
+- tag: Checkout
+  spec_file: kredivo-checkout-api-openapi.yml
+  capability_id: BC-1340.10
+  capability_id_l1: BC-1340
+  capability_name: Payment Initiation Management
+  confidence: 0.8
+  evidence: POST /kredivo/v2/checkout_url 'Initiate a 2-click or 0-click checkout'; POST /offline/v1/init_checkout
+    'Initiate a QR or EDC checkout'
+  reason: Merchant-facing initiation of a payment transaction (cart posted, redirect_url returned, QR/EDC
+    initiation) — capture and authorisation of a payment instruction. Some ambiguity because the instrument
+    is BNPL credit rather than a pure payment.
+- tag: Transactions
+  spec_file: kredivo-transactions-api-openapi.yml
+  capability_id: BC-1340.20
+  capability_id_l1: BC-1340
+  capability_name: Payment Processing Management
+  confidence: 0.7
+  evidence: POST /kredivo/transaction/status 'Check a transaction's status by order ID'; POST /kredivo/v2/cancel_transaction
+    'Cancel a transaction in full or in part'; POST /offline/v1/reversal_transaction 'Reverse an offline
+    (EDC) transaction'
+  reason: Post-initiation payment transaction handling — status enquiry, full/partial cancellation and
+    EDC reversal — is payment processing operations.
