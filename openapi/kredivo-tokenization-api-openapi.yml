@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
   title: Kredivo Checkout Calculator Tokenization API
   version: v2
@@ -116,6 +116,30 @@ paths:
                     remaining_user_limit: '4500000'
 components:
   schemas:
+    UserTokenRequest:
+      type: object
+      required:
+      - server_key
+      - user_token
+      properties:
+        server_key:
+          type: string
+        user_token:
+          type: string
+    ErrorDetail:
+      type: object
+      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
+      properties:
+        kind:
+          type: string
+          description: Type of error.
+        code:
+          type:
+          - integer
+          - 'null'
+          description: Numeric error code. May be null.
+        message:
+          type: string
     PaymentType:
       type: string
       description: Installment tenure chosen by the shopper.
@@ -173,30 +197,6 @@ components:
                     type: string
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    ErrorDetail:
-      type: object
-      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
-      properties:
-        kind:
-          type: string
-          description: Type of error.
-        code:
-          type:
-          - integer
-          - 'null'
-          description: Numeric error code. May be null.
-        message:
-          type: string
-    UserTokenRequest:
-      type: object
-      required:
-      - server_key
-      - user_token
-      properties:
-        server_key:
-          type: string
-        user_token:
-          type: string
   securitySchemes:
     serverKey:
       type: apiKey

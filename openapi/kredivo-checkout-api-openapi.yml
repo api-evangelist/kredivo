@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
   title: Kredivo Calculator Checkout API
   version: v2
@@ -190,58 +190,104 @@ paths:
                 order_id: '12345678912'
 components:
   schemas:
-    Customer:
+    ProductItem:
       type: object
+      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
+
+        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
+
+        '
       required:
-      - first_name
-      - email
-      - phone
+      - id
+      - name
+      - price
+      - quantity
       properties:
-        first_name:
+        id:
           type: string
-        last_name:
+          description: SKU, or one of the reserved fee/discount ids.
+        name:
           type: string
-        email:
+        price:
+          type: number
+          format: double
+        type:
           type: string
-          format: email
-        phone:
+          description: Product category.
+        url:
           type: string
-    CheckoutResponse:
-      type: object
-      properties:
-        status:
+          description: Product URL on the merchant site.
+        image_url:
+          type: string
+        quantity:
+          type: integer
+        parent_type:
           type: string
           enum:
-          - OK
-          - ERROR
-        message:
+          - SELLER
+          - ITEM
+        parent_id:
           type: string
-        redirect_url:
-          type: string
-          description: 'URL to send the shopper to. Omitted when a 0-click checkout completed without shopper
-
-            interaction; present on an invalid user_token so the merchant can fall back to 2-click.
-
-            '
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
-    TransactionDetails:
+          description: Seller or item id this line belongs to.
+    OfflineCheckoutRequest:
       type: object
       required:
-      - order_id
+      - server_key
       - amount
-      - items
+      - source
+      - order_id
+      - push_uri
       properties:
-        order_id:
+        server_key:
           type: string
-          description: Order id given by the merchant.
         amount:
           type: number
           format: double
+        source:
+          type: string
+          description: QR for a dynamic QR checkout, "EDC Mobile" for an EDC terminal checkout.
+          enum:
+          - QR
+          - EDC Mobile
+        qr_type:
+          type: string
+          description: Requested QR representation. IMAGE returns a QR image URL.
+          enum:
+          - IMAGE
+          - STRING
+        order_id:
+          type: string
+        sub_merchant_id:
+          type: string
+          description: Identifier of the sub-merchant / outlet.
+        push_uri:
+          type: string
+        mobile_number:
+          type: string
+          description: Shopper phone number. Used by EDC checkout.
+        terminal_id:
+          type: string
+          description: Optional outlet EDC device identifier.
+        sellers:
+          $ref: '#/components/schemas/Seller'
         items:
           type: array
           items:
             $ref: '#/components/schemas/ProductItem'
+    ErrorDetail:
+      type: object
+      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
+      properties:
+        kind:
+          type: string
+          description: Type of error.
+        code:
+          type:
+          - integer
+          - 'null'
+          description: Numeric error code. May be null.
+        message:
+          type: string
     CheckoutRequest:
       type: object
       required:
@@ -291,6 +337,23 @@ components:
         expiration_time:
           type: string
           description: Epoch seconds. Defaults to 24 hours.
+    TransactionDetails:
+      type: object
+      required:
+      - order_id
+      - amount
+      - items
+      properties:
+        order_id:
+          type: string
+          description: Order id given by the merchant.
+        amount:
+          type: number
+          format: double
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductItem'
     Address:
       type: object
       required:
@@ -316,6 +379,36 @@ components:
         country_code:
           type: string
           example: IDN
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
+    CheckoutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - OK
+          - ERROR
+        message:
+          type: string
+        redirect_url:
+          type: string
+          description: 'URL to send the shopper to. Omitted when a 0-click checkout completed without shopper
+
+            interaction; present on an invalid user_token so the merchant can fall back to 2-click.
+
+            '
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
     OfflineCheckoutResponse:
       type: object
       properties:
@@ -338,69 +431,21 @@ components:
           description: QR code string representation, returned when qr_type is STRING.
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
-    ProductItem:
+    Customer:
       type: object
-      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
-
-        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
-
-        '
       required:
-      - id
-      - name
-      - price
-      - quantity
+      - first_name
+      - email
+      - phone
       properties:
-        id:
+        first_name:
           type: string
-          description: SKU, or one of the reserved fee/discount ids.
-        name:
+        last_name:
           type: string
-        price:
-          type: number
-          format: double
-        type:
+        email:
           type: string
-          description: Product category.
-        url:
-          type: string
-          description: Product URL on the merchant site.
-        image_url:
-          type: string
-        quantity:
-          type: integer
-        parent_type:
-          type: string
-          enum:
-          - SELLER
-          - ITEM
-        parent_id:
-          type: string
-          description: Seller or item id this line belongs to.
-    ErrorDetail:
-      type: object
-      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
-      properties:
-        kind:
-          type: string
-          description: Type of error.
-        code:
-          type:
-          - integer
-          - 'null'
-          description: Numeric error code. May be null.
-        message:
+          format: email
+        phone:
           type: string
     Seller:
       type: object
@@ -437,51 +482,6 @@ components:
           type: string
         imsi:
           type: string
-    OfflineCheckoutRequest:
-      type: object
-      required:
-      - server_key
-      - amount
-      - source
-      - order_id
-      - push_uri
-      properties:
-        server_key:
-          type: string
-        amount:
-          type: number
-          format: double
-        source:
-          type: string
-          description: QR for a dynamic QR checkout, "EDC Mobile" for an EDC terminal checkout.
-          enum:
-          - QR
-          - EDC Mobile
-        qr_type:
-          type: string
-          description: Requested QR representation. IMAGE returns a QR image URL.
-          enum:
-          - IMAGE
-          - STRING
-        order_id:
-          type: string
-        sub_merchant_id:
-          type: string
-          description: Identifier of the sub-merchant / outlet.
-        push_uri:
-          type: string
-        mobile_number:
-          type: string
-          description: Shopper phone number. Used by EDC checkout.
-        terminal_id:
-          type: string
-          description: Optional outlet EDC device identifier.
-        sellers:
-          $ref: '#/components/schemas/Seller'
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductItem'
   securitySchemes:
     serverKey:
       type: apiKey

@@ -17,6 +17,13 @@
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
+  "notes": [
+    "kredivo-calculator-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "kredivo-checkout-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "kredivo-confirmation-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "kredivo-tokenization-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "kredivo-transactions-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
   "skipped": []
 }

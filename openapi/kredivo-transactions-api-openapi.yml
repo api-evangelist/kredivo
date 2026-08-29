@@ -1,4 +1,4 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
   title: Kredivo Checkout Calculator Transactions API
   version: v2
@@ -166,18 +166,39 @@ paths:
                       kind: deprecated
 components:
   schemas:
-    SimpleStatusResponse:
+    CancelTransactionRequest:
       type: object
+      required:
+      - server_key
+      - order_id
+      - transaction_id
       properties:
-        status:
+        server_key:
           type: string
-          enum:
-          - OK
-          - ERROR
-        message:
+        order_id:
           type: string
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
+        transaction_id:
+          type: string
+        cancellation_id:
+          type: string
+          maxLength: 60
+          description: 'Merchant-supplied idempotency key for the cancellation. One order id may have multiple
+
+            cancellation ids. When omitted, (order_id, cancellation_amount) is the uniqueness key and
+
+            a repeat within one hour is rejected.
+
+            '
+        cancellation_amount:
+          type: integer
+          description: Omit or match the transaction amount for a full cancellation; smaller for partial.
+        cancellation_reason:
+          type: string
+        cancelled_by:
+          type: string
+        cancellation_date:
+          type: string
+          description: Epoch seconds.
     ReversalRequest:
       type: object
       required:
@@ -188,27 +209,6 @@ components:
           type: string
         order_id:
           type: string
-    TransactionStatusRequest:
-      type: object
-      required:
-      - server_key
-      - order_id
-      properties:
-        server_key:
-          type: string
-        order_id:
-          type: string
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
     ErrorDetail:
       type: object
       description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
@@ -223,6 +223,18 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
+    SimpleStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - OK
+          - ERROR
+        message:
+          type: string
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
     TransactionStatus:
       type: object
       properties:
@@ -281,39 +293,27 @@ components:
           - deny
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    CancelTransactionRequest:
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
+    TransactionStatusRequest:
       type: object
       required:
       - server_key
       - order_id
-      - transaction_id
       properties:
         server_key:
           type: string
         order_id:
           type: string
-        transaction_id:
-          type: string
-        cancellation_id:
-          type: string
-          maxLength: 60
-          description: 'Merchant-supplied idempotency key for the cancellation. One order id may have multiple
-
-            cancellation ids. When omitted, (order_id, cancellation_amount) is the uniqueness key and
-
-            a repeat within one hour is rejected.
-
-            '
-        cancellation_amount:
-          type: integer
-          description: Omit or match the transaction amount for a full cancellation; smaller for partial.
-        cancellation_reason:
-          type: string
-        cancelled_by:
-          type: string
-        cancellation_date:
-          type: string
-          description: Epoch seconds.
   securitySchemes:
     serverKey:
       type: apiKey
