@@ -1,11 +1,7 @@
 {
   "provider": "kredivo",
   "sources": [
-    "kredivo-calculator-api-openapi.yml",
-    "kredivo-checkout-api-openapi.yml",
-    "kredivo-confirmation-api-openapi.yml",
-    "kredivo-tokenization-api-openapi.yml",
-    "kredivo-transactions-api-openapi.yml"
+    "_ae-authored/kredivo-checkout-openapi.yml"
   ],
   "outputs": [
     "kredivo-calculator-api-openapi.yml",
@@ -18,12 +14,15 @@
   "errors": [],
   "warnings": [],
   "notes": [
-    "kredivo-calculator-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "kredivo-checkout-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "kredivo-confirmation-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "kredivo-tokenization-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "kredivo-transactions-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "sourced from openapi/_original/ (0 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "kredivo-checkout-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "kredivo-calculator-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "kredivo-checkout-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "kredivo-confirmation-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "kredivo-tokenization-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "kredivo-transactions-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

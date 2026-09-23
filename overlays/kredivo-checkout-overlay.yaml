@@ -2,7 +2,7 @@ overlay: 1.0.0
 info:
   title: API Evangelist enhancements for the Kredivo Checkout API
   version: 1.0.0
-  description: |
+  x-description: |
     OpenAPI Overlay 1.0.0 capturing the API Evangelist enrichment layered onto the Kredivo Checkout
     API description. Kredivo publishes no OpenAPI of its own — openapi/kredivo-checkout-openapi.yml
     was transcribed from the published HTML documentation — so this overlay records the
