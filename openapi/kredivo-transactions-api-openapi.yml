@@ -236,17 +236,18 @@ components:
           - deny
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
+    SimpleStatusResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - OK
+          - ERROR
+        message:
+          type: string
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
     CancelTransactionRequest:
       type: object
       required:
@@ -290,18 +291,6 @@ components:
           type: string
         order_id:
           type: string
-    SimpleStatusResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - OK
-          - ERROR
-        message:
-          type: string
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
     TransactionStatusRequest:
       type: object
       required:
@@ -312,6 +301,17 @@ components:
           type: string
         order_id:
           type: string
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
   securitySchemes:
     serverKey:
       type: apiKey

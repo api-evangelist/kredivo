@@ -95,6 +95,24 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
+    PaymentsRequest:
+      type: object
+      required:
+      - server_key
+      - amount
+      - items
+      properties:
+        server_key:
+          type: string
+        user_token:
+          type: string
+        amount:
+          type: number
+          format: double
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductItem'
     ProductItem:
       type: object
       description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
@@ -134,35 +152,6 @@ components:
         parent_id:
           type: string
           description: Seller or item id this line belongs to.
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
-    PaymentsRequest:
-      type: object
-      required:
-      - server_key
-      - amount
-      - items
-      properties:
-        server_key:
-          type: string
-        user_token:
-          type: string
-        amount:
-          type: number
-          format: double
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductItem'
     PaymentsResponse:
       type: object
       properties:
@@ -205,6 +194,17 @@ components:
                 - 'null'
         error:
           $ref: '#/components/schemas/ErrorDetail'
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
   securitySchemes:
     serverKey:
       type: apiKey

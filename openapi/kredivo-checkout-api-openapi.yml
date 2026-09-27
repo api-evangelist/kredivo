@@ -202,25 +202,31 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
-    CheckoutResponse:
+    Address:
       type: object
+      required:
+      - first_name
+      - address
+      - city
+      - postal_code
+      - phone
+      - country_code
       properties:
-        status:
+        first_name:
           type: string
-          enum:
-          - OK
-          - ERROR
-        message:
+        last_name:
           type: string
-        redirect_url:
+        address:
           type: string
-          description: 'URL to send the shopper to. Omitted when a 0-click checkout completed without shopper
-
-            interaction; present on an invalid user_token so the merchant can fall back to 2-click.
-
-            '
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
+        city:
+          type: string
+        postal_code:
+          type: string
+        phone:
+          type: string
+        country_code:
+          type: string
+          example: IDN
     Seller:
       type: object
       description: A marketplace seller. Required when the merchant is a marketplace.
@@ -244,6 +250,81 @@ components:
           type: string
         address:
           $ref: '#/components/schemas/Address'
+    TransactionDetails:
+      type: object
+      required:
+      - order_id
+      - amount
+      - items
+      properties:
+        order_id:
+          type: string
+          description: Order id given by the merchant.
+        amount:
+          type: number
+          format: double
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductItem'
+    ProductItem:
+      type: object
+      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
+
+        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
+
+        '
+      required:
+      - id
+      - name
+      - price
+      - quantity
+      properties:
+        id:
+          type: string
+          description: SKU, or one of the reserved fee/discount ids.
+        name:
+          type: string
+        price:
+          type: number
+          format: double
+        type:
+          type: string
+          description: Product category.
+        url:
+          type: string
+          description: Product URL on the merchant site.
+        image_url:
+          type: string
+        quantity:
+          type: integer
+        parent_type:
+          type: string
+          enum:
+          - SELLER
+          - ITEM
+        parent_id:
+          type: string
+          description: Seller or item id this line belongs to.
+    CheckoutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - OK
+          - ERROR
+        message:
+          type: string
+        redirect_url:
+          type: string
+          description: 'URL to send the shopper to. Omitted when a 0-click checkout completed without shopper
+
+            interaction; present on an invalid user_token so the merchant can fall back to 2-click.
+
+            '
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
     OfflineCheckoutRequest:
       type: object
       required:
@@ -289,6 +370,45 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductItem'
+    Metadata:
+      type: object
+      description: Device and network signals used by Kredivo's fraud detection system.
+      properties:
+        ip_address:
+          type: string
+        user_agent:
+          type: string
+        device_id:
+          type: string
+        imsi:
+          type: string
+    Customer:
+      type: object
+      required:
+      - first_name
+      - email
+      - phone
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
     CheckoutRequest:
       type: object
       required:
@@ -338,126 +458,6 @@ components:
         expiration_time:
           type: string
           description: Epoch seconds. Defaults to 24 hours.
-    ProductItem:
-      type: object
-      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
-
-        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
-
-        '
-      required:
-      - id
-      - name
-      - price
-      - quantity
-      properties:
-        id:
-          type: string
-          description: SKU, or one of the reserved fee/discount ids.
-        name:
-          type: string
-        price:
-          type: number
-          format: double
-        type:
-          type: string
-          description: Product category.
-        url:
-          type: string
-          description: Product URL on the merchant site.
-        image_url:
-          type: string
-        quantity:
-          type: integer
-        parent_type:
-          type: string
-          enum:
-          - SELLER
-          - ITEM
-        parent_id:
-          type: string
-          description: Seller or item id this line belongs to.
-    Metadata:
-      type: object
-      description: Device and network signals used by Kredivo's fraud detection system.
-      properties:
-        ip_address:
-          type: string
-        user_agent:
-          type: string
-        device_id:
-          type: string
-        imsi:
-          type: string
-    Address:
-      type: object
-      required:
-      - first_name
-      - address
-      - city
-      - postal_code
-      - phone
-      - country_code
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        address:
-          type: string
-        city:
-          type: string
-        postal_code:
-          type: string
-        phone:
-          type: string
-        country_code:
-          type: string
-          example: IDN
-    Customer:
-      type: object
-      required:
-      - first_name
-      - email
-      - phone
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        email:
-          type: string
-          format: email
-        phone:
-          type: string
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
-    TransactionDetails:
-      type: object
-      required:
-      - order_id
-      - amount
-      - items
-      properties:
-        order_id:
-          type: string
-          description: Order id given by the merchant.
-        amount:
-          type: number
-          format: double
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductItem'
     OfflineCheckoutResponse:
       type: object
       properties:

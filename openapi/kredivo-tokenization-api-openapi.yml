@@ -128,6 +128,16 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
+    UserTokenRequest:
+      type: object
+      required:
+      - server_key
+      - user_token
+      properties:
+        server_key:
+          type: string
+        user_token:
+          type: string
     UserTokenResponse:
       type: object
       properties:
@@ -155,16 +165,6 @@ components:
       - 12_months
       - 18_months
       - 24_months
-    UserTokenRequest:
-      type: object
-      required:
-      - server_key
-      - user_token
-      properties:
-        server_key:
-          type: string
-        user_token:
-          type: string
     UserCreditDetailsResponse:
       type: object
       properties:
