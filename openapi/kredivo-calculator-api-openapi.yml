@@ -95,6 +95,17 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
     PaymentsRequest:
       type: object
       required:
@@ -194,17 +205,6 @@ components:
                 - 'null'
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
   securitySchemes:
     serverKey:
       type: apiKey

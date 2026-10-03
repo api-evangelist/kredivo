@@ -188,45 +188,6 @@ paths:
                 order_id: '12345678912'
 components:
   schemas:
-    ErrorDetail:
-      type: object
-      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
-      properties:
-        kind:
-          type: string
-          description: Type of error.
-        code:
-          type:
-          - integer
-          - 'null'
-          description: Numeric error code. May be null.
-        message:
-          type: string
-    Address:
-      type: object
-      required:
-      - first_name
-      - address
-      - city
-      - postal_code
-      - phone
-      - country_code
-      properties:
-        first_name:
-          type: string
-        last_name:
-          type: string
-        address:
-          type: string
-        city:
-          type: string
-        postal_code:
-          type: string
-        phone:
-          type: string
-        country_code:
-          type: string
-          example: IDN
     Seller:
       type: object
       description: A marketplace seller. Required when the merchant is a marketplace.
@@ -250,81 +211,31 @@ components:
           type: string
         address:
           $ref: '#/components/schemas/Address'
-    TransactionDetails:
+    ErrorDetail:
       type: object
-      required:
-      - order_id
-      - amount
-      - items
+      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
       properties:
-        order_id:
+        kind:
           type: string
-          description: Order id given by the merchant.
-        amount:
-          type: number
-          format: double
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductItem'
-    ProductItem:
-      type: object
-      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
-
-        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
-
-        '
-      required:
-      - id
-      - name
-      - price
-      - quantity
-      properties:
-        id:
-          type: string
-          description: SKU, or one of the reserved fee/discount ids.
-        name:
-          type: string
-        price:
-          type: number
-          format: double
-        type:
-          type: string
-          description: Product category.
-        url:
-          type: string
-          description: Product URL on the merchant site.
-        image_url:
-          type: string
-        quantity:
-          type: integer
-        parent_type:
-          type: string
-          enum:
-          - SELLER
-          - ITEM
-        parent_id:
-          type: string
-          description: Seller or item id this line belongs to.
-    CheckoutResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          enum:
-          - OK
-          - ERROR
+          description: Type of error.
+        code:
+          type:
+          - integer
+          - 'null'
+          description: Numeric error code. May be null.
         message:
           type: string
-        redirect_url:
-          type: string
-          description: 'URL to send the shopper to. Omitted when a 0-click checkout completed without shopper
-
-            interaction; present on an invalid user_token so the merchant can fall back to 2-click.
-
-            '
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
     OfflineCheckoutRequest:
       type: object
       required:
@@ -370,6 +281,103 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductItem'
+    TransactionDetails:
+      type: object
+      required:
+      - order_id
+      - amount
+      - items
+      properties:
+        order_id:
+          type: string
+          description: Order id given by the merchant.
+        amount:
+          type: number
+          format: double
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductItem'
+    CheckoutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - OK
+          - ERROR
+        message:
+          type: string
+        redirect_url:
+          type: string
+          description: 'URL to send the shopper to. Omitted when a 0-click checkout completed without shopper
+
+            interaction; present on an invalid user_token so the merchant can fall back to 2-click.
+
+            '
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+    ProductItem:
+      type: object
+      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
+
+        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
+
+        '
+      required:
+      - id
+      - name
+      - price
+      - quantity
+      properties:
+        id:
+          type: string
+          description: SKU, or one of the reserved fee/discount ids.
+        name:
+          type: string
+        price:
+          type: number
+          format: double
+        type:
+          type: string
+          description: Product category.
+        url:
+          type: string
+          description: Product URL on the merchant site.
+        image_url:
+          type: string
+        quantity:
+          type: integer
+        parent_type:
+          type: string
+          enum:
+          - SELLER
+          - ITEM
+        parent_id:
+          type: string
+          description: Seller or item id this line belongs to.
+    OfflineCheckoutResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - OK
+          - ERROR
+        message:
+          type: string
+        transaction_id:
+          type: string
+        order_id:
+          type: string
+        qr_url:
+          type: string
+          description: QR code image URL, returned when qr_type is IMAGE.
+        qr_string:
+          type: string
+          description: QR code string representation, returned when qr_type is STRING.
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
     Metadata:
       type: object
       description: Device and network signals used by Kredivo's fraud detection system.
@@ -398,17 +406,6 @@ components:
           format: email
         phone:
           type: string
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
     CheckoutRequest:
       type: object
       required:
@@ -458,28 +455,31 @@ components:
         expiration_time:
           type: string
           description: Epoch seconds. Defaults to 24 hours.
-    OfflineCheckoutResponse:
+    Address:
       type: object
+      required:
+      - first_name
+      - address
+      - city
+      - postal_code
+      - phone
+      - country_code
       properties:
-        status:
+        first_name:
           type: string
-          enum:
-          - OK
-          - ERROR
-        message:
+        last_name:
           type: string
-        transaction_id:
+        address:
           type: string
-        order_id:
+        city:
           type: string
-        qr_url:
+        postal_code:
           type: string
-          description: QR code image URL, returned when qr_type is IMAGE.
-        qr_string:
+        phone:
           type: string
-          description: QR code string representation, returned when qr_type is STRING.
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
+        country_code:
+          type: string
+          example: IDN
   securitySchemes:
     serverKey:
       type: apiKey

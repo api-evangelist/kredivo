@@ -128,32 +128,6 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
-    UserTokenRequest:
-      type: object
-      required:
-      - server_key
-      - user_token
-      properties:
-        server_key:
-          type: string
-        user_token:
-          type: string
-    UserTokenResponse:
-      type: object
-      properties:
-        Status:
-          type: string
-        status:
-          type: string
-        user_token:
-          type: string
-        is_active:
-          type: boolean
-          description: When false, Kredivo cannot provide user credit details for this token.
-        remarks:
-          type: string
-        error:
-          $ref: '#/components/schemas/ErrorDetail'
     PaymentType:
       type: string
       description: Installment tenure chosen by the shopper.
@@ -195,6 +169,32 @@ components:
                     type: string
         error:
           $ref: '#/components/schemas/ErrorDetail'
+    UserTokenResponse:
+      type: object
+      properties:
+        Status:
+          type: string
+        status:
+          type: string
+        user_token:
+          type: string
+        is_active:
+          type: boolean
+          description: When false, Kredivo cannot provide user credit details for this token.
+        remarks:
+          type: string
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+    UserTokenRequest:
+      type: object
+      required:
+      - server_key
+      - user_token
+      properties:
+        server_key:
+          type: string
+        user_token:
+          type: string
   securitySchemes:
     serverKey:
       type: apiKey
