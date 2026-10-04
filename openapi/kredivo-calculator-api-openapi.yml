@@ -124,45 +124,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductItem'
-    ProductItem:
-      type: object
-      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
-
-        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
-
-        '
-      required:
-      - id
-      - name
-      - price
-      - quantity
-      properties:
-        id:
-          type: string
-          description: SKU, or one of the reserved fee/discount ids.
-        name:
-          type: string
-        price:
-          type: number
-          format: double
-        type:
-          type: string
-          description: Product category.
-        url:
-          type: string
-          description: Product URL on the merchant site.
-        image_url:
-          type: string
-        quantity:
-          type: integer
-        parent_type:
-          type: string
-          enum:
-          - SELLER
-          - ITEM
-        parent_id:
-          type: string
-          description: Seller or item id this line belongs to.
     PaymentsResponse:
       type: object
       properties:
@@ -205,6 +166,45 @@ components:
                 - 'null'
         error:
           $ref: '#/components/schemas/ErrorDetail'
+    ProductItem:
+      type: object
+      description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,
+
+        `discount`, `additionalfee`, `insurancefee` and `mixpayment` for non-product lines.
+
+        '
+      required:
+      - id
+      - name
+      - price
+      - quantity
+      properties:
+        id:
+          type: string
+          description: SKU, or one of the reserved fee/discount ids.
+        name:
+          type: string
+        price:
+          type: number
+          format: double
+        type:
+          type: string
+          description: Product category.
+        url:
+          type: string
+          description: Product URL on the merchant site.
+        image_url:
+          type: string
+        quantity:
+          type: integer
+        parent_type:
+          type: string
+          enum:
+          - SELLER
+          - ITEM
+        parent_id:
+          type: string
+          description: Seller or item id this line belongs to.
   securitySchemes:
     serverKey:
       type: apiKey

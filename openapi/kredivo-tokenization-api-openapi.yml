@@ -169,6 +169,16 @@ components:
                     type: string
         error:
           $ref: '#/components/schemas/ErrorDetail'
+    UserTokenRequest:
+      type: object
+      required:
+      - server_key
+      - user_token
+      properties:
+        server_key:
+          type: string
+        user_token:
+          type: string
     UserTokenResponse:
       type: object
       properties:
@@ -185,16 +195,6 @@ components:
           type: string
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    UserTokenRequest:
-      type: object
-      required:
-      - server_key
-      - user_token
-      properties:
-        server_key:
-          type: string
-        user_token:
-          type: string
   securitySchemes:
     serverKey:
       type: apiKey
