@@ -1,0 +1,16 @@
+generated: '2026-10-12'
+method: none
+source:
+- https://zapier.com/apps/kredivo/integrations
+- https://n8n.io/integrations/kredivo/
+- https://composio.dev/toolkits/kredivo
+- https://monid.ai/tools/kredivo
+checked:
+- https://composio.dev/toolkits/kredivo
+- https://monid.ai/tools/kredivo
+- https://n8n.io/integrations/kredivo/
+- https://zapier.com/apps/kredivo/integrations
+summary: null
+marketplace_apps: []
+edges: []
+templates: []
