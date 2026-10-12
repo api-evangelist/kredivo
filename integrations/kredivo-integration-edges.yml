@@ -1,5 +1,5 @@
 generated: '2026-10-12'
-method: none
+method: searched
 source:
 - https://zapier.com/apps/kredivo/integrations
 - https://n8n.io/integrations/kredivo/
@@ -12,5 +12,20 @@ checked:
 - https://zapier.com/apps/kredivo/integrations
 summary: null
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: goto-gojek
+  partner: goto-gojek
+  partner_match: domain
+  type: contract
+  channel: partner-built
+  relationship: rail
+  direction: partner-built
+  evidence: https://github.com/api-evangelist/goto-gojek/blob/main/openapi/goto-gojek-transactions-api-openapi.yml
+  contract_reference:
+    repo: goto-gojek
+    spec_file: goto-gojek-transactions-api-openapi.yml
+    value: kredivo
+    property: schemas.ChargeRequest.payment_type
+    detected_by: detect-payment-method-edges.py
+    detected: '2026-10-12'
 templates: []
