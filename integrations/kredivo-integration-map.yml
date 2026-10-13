@@ -1,0 +1,29 @@
+# DERIVED by derive-integration-map.py (roadmap#949): each integration workflow, step by step,
+# resolved to spec file -> tag -> business capability (Turbo EA, CC BY 4.0) and the operation's
+# phrasing intent. Read from our own files; an unmapped link says why.
+slug: kredivo
+workflows:
+- file: kredivo-goto-gojek-preconfig.yml
+  title: 'kredivo through goto-gojek: charge preconfigured with kredivo'
+  partner: goto-gojek
+  template: null
+  repos:
+  - goto-gojek
+  steps:
+  - step: call-with-preset
+    repo: goto-gojek
+    spec_file: goto-gojek-transactions-api-openapi.yml
+    operationId: charge
+    tag: Transactions
+    capability_id: null
+    capability: null
+    capability_l1: null
+    intent: null
+    effect: null
+    unmapped: no capability edge for this spec file
+  connects:
+    goto-gojek:
+      capabilities: []
+      tags:
+      - Transactions
+  intents: []
