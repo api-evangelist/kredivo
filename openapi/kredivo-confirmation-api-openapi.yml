@@ -138,6 +138,17 @@ components:
           - deny
         error:
           $ref: '#/components/schemas/ErrorDetail'
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
     ErrorDetail:
       type: object
       description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
@@ -152,17 +163,6 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
   securitySchemes:
     serverKey:
       type: apiKey

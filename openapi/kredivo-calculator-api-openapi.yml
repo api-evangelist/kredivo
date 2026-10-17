@@ -81,20 +81,6 @@ paths:
                 status: OK
 components:
   schemas:
-    ErrorDetail:
-      type: object
-      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
-      properties:
-        kind:
-          type: string
-          description: Type of error.
-        code:
-          type:
-          - integer
-          - 'null'
-          description: Numeric error code. May be null.
-        message:
-          type: string
     PaymentType:
       type: string
       description: Installment tenure chosen by the shopper.
@@ -166,6 +152,20 @@ components:
                 - 'null'
         error:
           $ref: '#/components/schemas/ErrorDetail'
+    ErrorDetail:
+      type: object
+      description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
+      properties:
+        kind:
+          type: string
+          description: Type of error.
+        code:
+          type:
+          - integer
+          - 'null'
+          description: Numeric error code. May be null.
+        message:
+          type: string
     ProductItem:
       type: object
       description: 'A cart line. Beyond real SKUs, Kredivo reserves the ids `shippingfee`, `adminfee`, `taxfee`,

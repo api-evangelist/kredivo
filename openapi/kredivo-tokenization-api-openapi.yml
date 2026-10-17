@@ -114,6 +114,27 @@ paths:
                     remaining_user_limit: '4500000'
 components:
   schemas:
+    UserTokenRequest:
+      type: object
+      required:
+      - server_key
+      - user_token
+      properties:
+        server_key:
+          type: string
+        user_token:
+          type: string
+    PaymentType:
+      type: string
+      description: Installment tenure chosen by the shopper.
+      enum:
+      - 30_days
+      - 3_months
+      - 6_months
+      - 9_months
+      - 12_months
+      - 18_months
+      - 24_months
     ErrorDetail:
       type: object
       description: Kredivo's error envelope. Note the API returns HTTP 200 with status ERROR.
@@ -128,17 +149,6 @@ components:
           description: Numeric error code. May be null.
         message:
           type: string
-    PaymentType:
-      type: string
-      description: Installment tenure chosen by the shopper.
-      enum:
-      - 30_days
-      - 3_months
-      - 6_months
-      - 9_months
-      - 12_months
-      - 18_months
-      - 24_months
     UserCreditDetailsResponse:
       type: object
       properties:
@@ -169,16 +179,6 @@ components:
                     type: string
         error:
           $ref: '#/components/schemas/ErrorDetail'
-    UserTokenRequest:
-      type: object
-      required:
-      - server_key
-      - user_token
-      properties:
-        server_key:
-          type: string
-        user_token:
-          type: string
     UserTokenResponse:
       type: object
       properties:
