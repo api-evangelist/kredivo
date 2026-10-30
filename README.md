@@ -64,6 +64,128 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Kredivo is a company surfaced as a portfolio company of 500-global and added to the API Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+Kredivo is a Southeast Asian consumer credit platform operated by FinAccel (Kredivo Group), best known for its "Buy Now, Pay Later" product offering instant real-time credit decisioning for online and offline purchases across Indonesia, Vietnam, Thailand and the Philippines. For developers, Kredivo publishes the Kredivo Checkout API — a merchant-facing HTTP/JSON payment API that lets an ecommerce store, marketplace, POS or EDC terminal offer installment payment (30 days through 24 months) at checkout. The API covers 2-click redirect checkout, 0-click tokenized express checkout, dynamic and static QR checkout for physical stores, EDC terminal checkout, transaction status polling, full and partial cancellation, user credit-limit lookup, and an installment/interest calculator, with asynchronous push notifications to a merchant-supplied push_uri and a signature-key confirmation callback. Kredivo Group also operates KrediFazz (instant cash loans), Krom (digital bank), Timo and GajiGesa.
 
-Backed by: 500-global — https://finaccel.co
+**Areas:** Company · Payments · Buy Now Pay Later · Lending · Consumer Credit · Checkout · Fintech · E-Commerce · Indonesia · Southeast Asia · Financial Services
+
+## Kredivo on APIs.io
+
+Everything profiled for Kredivo is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/kredivo/](https://apis.io/providers/kredivo/)** — or go straight to one of the APIs or properties below.
+
+### APIs (5)
+
+- [Kredivo Calculator API](https://apis.io/apis/kredivo/kredivo-calculator-api/) — Installment, interest and service-fee breakdown.
+- [Kredivo Checkout API](https://apis.io/apis/kredivo/kredivo-checkout-api/) — Initiating a Kredivo installment checkout (2-click, 0-click, QR, EDC).
+- [Kredivo Confirmation API](https://apis.io/apis/kredivo/kredivo-confirmation-api/) — Confirming a transaction after a push notification.
+- [Kredivo Tokenization API](https://apis.io/apis/kredivo/kredivo-tokenization-api/) — Managing tokenized (0-click) shoppers and their credit limits.
+- [Kredivo Transactions API](https://apis.io/apis/kredivo/kredivo-transactions-api/) — Status, cancellation and reversal of transactions.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Kredivo Checkout Webhooks](https://apis.io/asyncapis/kredivo/kredivo-checkout-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [kredivo](https://apis.io/servers/kredivo/kredivo/)
+
+#### Collections (5)
+
+Postman and Open Collection request collections.
+
+- [Kredivo Checkout Calculator API](https://apis.io/collections/kredivo/open-kredivo-calculator-api/)
+- [Kredivo Calculator Checkout API](https://apis.io/collections/kredivo/open-kredivo-checkout-api/)
+- [Kredivo Checkout Calculator Confirmation API](https://apis.io/collections/kredivo/open-kredivo-confirmation-api/)
+- [Kredivo Checkout Calculator Tokenization API](https://apis.io/collections/kredivo/open-kredivo-tokenization-api/)
+- [Kredivo Checkout Calculator Transactions API](https://apis.io/collections/kredivo/open-kredivo-transactions-api/)
+
+#### Overlays (1)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Kredivo Checkout Overlay](https://apis.io/overlays/kredivo/kredivo-checkout-overlay/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Kredivo Authentication](https://apis.io/security/kredivo/kredivo-authentication/)
+- [Kredivo Domain Security](https://apis.io/security/kredivo/kredivo-domain-security/)
+- [Kredivo Vulnerability Disclosure](https://apis.io/security/kredivo/kredivo-vulnerability-disclosure/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://finaccel.co)
+- [Documentation](https://doc.kredivo.com/)
+- [Getting started](https://doc.kredivo.com/)
+- [API reference](https://doc.kredivo.com/)
+- [Sign up](https://kredivo.com/merchant/)
+- [Support](https://kredivo.com/faqs/)
+- [Blog](https://blog.kredivo.com/)
+- [Terms of service](https://kredivo.com/p/in/tos.html)
+- [Privacy policy](https://kredivo.com/p/in/privacy.html)
+- [Status](https://status.kredivo.com/)
+
+## API Evangelist rating
+
+**Kin Score 40.4** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 78.6 |
+| Contract quality | 22.0 |
+| Contract governance | 4.5 |
+| Operational transparency | 34.2 |
+| Developer ergonomics | 73.2 |
+| Access clarity | 34.2 |
+
+**Agent readiness 35.0** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | documented (partial credit) |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | — |
+| Event Surface Described | yes |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 27.7** — Payments
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/kredivo/](https://apis.io/providers/kredivo/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Kredivo: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/kredivo/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
